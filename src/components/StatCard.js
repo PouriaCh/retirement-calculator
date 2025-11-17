@@ -1,0 +1,3 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { InfoTooltip } from './InfoTooltip';
+export const StatCard = ({ label, value, helper, tooltip }) => (_jsxs("div", { className: "rounded-3xl border border-white/5 bg-white/5 p-5 shadow-lg shadow-black/20", children: [_jsxs("div", { className: "flex items-center gap-2", children: [_jsx("p", { className: "text-sm uppercase tracking-wide text-slate-400", children: label }), tooltip ? (_jsx(InfoTooltip, { label: label, children: _jsx("span", { children: tooltip }) })) : null] }), _jsx("p", { className: "mt-2 text-2xl font-semibold text-white", children: value }), helper ? _jsx("p", { className: "mt-1 text-xs text-slate-400", children: helper }) : null] }));

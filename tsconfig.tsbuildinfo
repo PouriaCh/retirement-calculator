@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/balanceminichart.tsx","./src/components/infotooltip.tsx","./src/components/numberfield.tsx","./src/components/projectionchart.tsx","./src/components/sliderfield.tsx","./src/components/statcard.tsx","./src/lib/calculator.ts"],"version":"5.9.3"}
