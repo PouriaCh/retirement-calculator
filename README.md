@@ -48,5 +48,32 @@ docker compose up --build
 ```
 This maps the app to http://localhost:3000 and restarts automatically unless stopped.
 
+Docker Compose keeps the containers it previously created and simply restarts them on subsequent `up` runs, even when you pass `--build`. If you need a fresh container each time, either bring the stack down first or force recreation:
+
+```sh
+docker compose down        # stop + remove containers and network
+docker compose up --build  # start from a clean slate
+# or in one shot
+docker compose up --build --force-recreate
+```
+
+To completely clean up everything (containers, anonymous volumes, and locally built images), run:
+
+```sh
+docker compose down --volumes --rmi local --remove-orphans
+```
+
+## Make targets
+Common Docker Compose flows are wrapped in the provided `Makefile` so you can type less:
+
+```sh
+make up        # docker compose up --build
+make down      # docker compose down
+make recreate  # docker compose up --build --force-recreate
+make clean     # docker compose down --volumes --rmi local --remove-orphans
+```
+
+Override the compose binary by setting `COMPOSE="docker compose"` or `COMPOSE="docker-compose"` when needed (default is `docker compose`).
+
 ## Customizing
 All calculator math lives in `src/lib/calculator.ts`. Tweak assumptions (compounding cadence, CRA limit ceiling, withdrawal heuristics, etc.) there. UI pieces live under `src/components/` for easy iteration.
