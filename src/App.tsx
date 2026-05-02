@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Calculator, PiggyBank } from 'lucide-react';
 import { NumberField } from './components/NumberField';
 import { SliderField } from './components/SliderField';
@@ -19,6 +19,8 @@ const defaultPlan: PlanInput = {
   contribution: 850,
   annualIncome: 90000,
   rrspCarryForward: 0,
+  employerMatchPercent: 0,
+  employerMatchCap: 0,
   annualReturn: 6.5,
   inflation: 2.1,
   salaryGrowth: 2.5,
@@ -69,9 +71,31 @@ const sampleMilestones = <T,>(data: T[], target = 8) => {
   return data.filter((_, index) => index % bucketSize === 0 || index === data.length - 1);
 };
 
+const STORAGE_KEY_PLAN = 'retirement-planner:plan';
+const STORAGE_KEY_TFSA = 'retirement-planner:tfsa';
+
+function loadFromStorage<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return { ...fallback, ...JSON.parse(raw) } as T;
+  } catch {
+    return fallback;
+  }
+}
+
 function App() {
-  const [plan, setPlan] = useState<PlanInput>(defaultPlan);
-  const [tfsaPlan, setTfsaPlan] = useState<TfsaPlanInput>(defaultTfsaPlan);
+  const [plan, setPlan] = useState<PlanInput>(() => loadFromStorage(STORAGE_KEY_PLAN, defaultPlan));
+  const [tfsaPlan, setTfsaPlan] = useState<TfsaPlanInput>(() => loadFromStorage(STORAGE_KEY_TFSA, defaultTfsaPlan));
+
+  // Persist whenever state changes
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PLAN, JSON.stringify(plan));
+  }, [plan]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_TFSA, JSON.stringify(tfsaPlan));
+  }, [tfsaPlan]);
 
   const projection = useMemo(() => calculateProjection(plan), [plan]);
   const summary = useMemo(() => summarizeProjection(projection), [projection]);
@@ -93,7 +117,15 @@ function App() {
   const baseDeductionRoom = Math.min(plan.annualIncome * 0.18, CRA_MAX_2024);
   const maxDeductible = baseDeductionRoom + (plan.rrspCarryForward ?? 0);
   const overContribution = annualContribution > maxDeductible;
-  const remainingRoom = Math.max(0, maxDeductible - annualContribution);
+
+  // Employer match derived values (mirrors calculator logic for display)
+  const matchRate = (plan.employerMatchPercent ?? 0) / 100;
+  const matchCapRate = (plan.employerMatchCap ?? 0) / 100;
+  const uncappedAnnualMatch = annualContribution * matchRate;
+  const matchCeiling = plan.annualIncome * matchCapRate;
+  const annualEmployerMatch =
+    matchCapRate > 0 ? Math.min(uncappedAnnualMatch, matchCeiling) : uncappedAnnualMatch;
+  const hasEmployerMatch = annualEmployerMatch > 0;  const remainingRoom = Math.max(0, maxDeductible - annualContribution);
   const tfsaOverContribution = tfsaAnnualContribution > TFSA_ANNUAL_LIMIT_2024;
   const tfsaRemainingRoom = Math.max(0, TFSA_ANNUAL_LIMIT_2024 - tfsaAnnualContribution);
   const safeWithdrawal = summary.finalBalance * 0.04;
@@ -235,6 +267,26 @@ function App() {
                 onChange={(value) => updatePlan('rrspCarryForward', value)}
                 helper="Enter the RRSP room shown on your latest Notice of Assessment"
               />
+              <NumberField
+                label="Employer match rate (optional)"
+                suffix="%"
+                value={plan.employerMatchPercent ?? 0}
+                min={0}
+                max={200}
+                step={5}
+                onChange={(value) => updatePlan('employerMatchPercent', value)}
+                helper="e.g. 50 = employer matches 50¢ for every $1 you contribute"
+              />
+              <NumberField
+                label="Employer match cap (optional)"
+                suffix="% of salary"
+                value={plan.employerMatchCap ?? 0}
+                min={0}
+                max={20}
+                step={0.5}
+                onChange={(value) => updatePlan('employerMatchCap', value)}
+                helper="Match stops once it hits this % of your annual salary (0 = no cap)"
+              />
               <div className="space-y-2 text-sm font-medium text-slate-200">
                 <span>Contribution frequency</span>
                 <select
@@ -271,6 +323,15 @@ function App() {
               ) : (
                 <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
                   You have about {currency.format(remainingRoom)} of RRSP room remaining this year, including carry-forward protection.
+                </div>
+              )}
+              {hasEmployerMatch && (
+                <div className="col-span-full rounded-2xl border border-violet-500/20 bg-violet-500/10 px-4 py-3 text-sm text-violet-100">
+                  <span className="font-semibold">Employer adds {currency.format(annualEmployerMatch)} / year</span>
+                  {matchCapRate > 0 && uncappedAnnualMatch > matchCeiling && (
+                    <span className="text-violet-200/80"> (capped at {(plan.employerMatchCap ?? 0)}% of salary)</span>
+                  )}
+                  {' '}— that's free money already baked into your projection.
                 </div>
               )}
             </div>
