@@ -8,6 +8,16 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# TypeScript build artifacts
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+src/**/*.js
+tests/**/*.js
+
+# Coverage
+coverage/
+
 # env
 .env
 .env.*
@@ -22,6 +32,3 @@ pnpm-debug.log*
 
 # Docker
 docker-volume/
-
-# misc
-coverage/

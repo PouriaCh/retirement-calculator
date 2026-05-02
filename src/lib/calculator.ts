@@ -7,6 +7,8 @@ export interface PlanInput {
   contribution: number; // contribution amount per selected frequency
   annualIncome: number;
   rrspCarryForward?: number;
+  employerMatchPercent?: number; // employer matches this % of employee contribution (e.g. 50 = 50%)
+  employerMatchCap?: number; // employer match is capped at this % of annual salary (e.g. 3 = 3%)
   annualReturn: number; // percent
   inflation: number; // percent
   salaryGrowth: number; // percent
@@ -35,7 +37,8 @@ export const calculateProjection = (input: PlanInput): ProjectionYear[] => {
   const projection: ProjectionYear[] = [];
 
   let balance = input.currentBalance;
-  let contributionAnnual = input.contribution * PERIODS_PER_YEAR[input.frequency];
+  let employeeAnnual = input.contribution * PERIODS_PER_YEAR[input.frequency];
+  let currentIncome = input.annualIncome;
   let totalContributions = 0;
   let totalGrowth = 0;
 
@@ -44,9 +47,19 @@ export const calculateProjection = (input: PlanInput): ProjectionYear[] => {
   const salaryGrowthRate = input.salaryGrowth / 100;
   const monthlyReturn = Math.pow(1 + annualReturnRate, 1 / 12) - 1;
 
+  const matchRate = (input.employerMatchPercent ?? 0) / 100;
+  const matchCapRate = (input.employerMatchCap ?? 0) / 100;
+
   for (let year = 0; year < years; year += 1) {
     const age = input.currentAge + year;
-    const monthlyContribution = contributionAnnual / 12;
+
+    // Employer match: match% of employee contribution, capped at matchCap% of salary
+    const uncappedMatch = employeeAnnual * matchRate;
+    const matchCeiling = currentIncome * matchCapRate;
+    const employerAnnual = matchCapRate > 0 ? Math.min(uncappedMatch, matchCeiling) : uncappedMatch;
+
+    const totalAnnual = employeeAnnual + employerAnnual;
+    const monthlyContribution = totalAnnual / 12;
     let contributionsThisYear = 0;
     let interestThisYear = 0;
 
@@ -74,7 +87,8 @@ export const calculateProjection = (input: PlanInput): ProjectionYear[] => {
       totalGrowth,
     });
 
-    contributionAnnual *= 1 + salaryGrowthRate;
+    employeeAnnual *= 1 + salaryGrowthRate;
+    currentIncome *= 1 + salaryGrowthRate;
   }
 
   return projection;
