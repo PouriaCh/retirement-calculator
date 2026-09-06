@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Calculator, PiggyBank } from 'lucide-react';
+import {
+  AlertTriangle,
+  Calculator,
+  CheckCircle2,
+  Link,
+  PiggyBank,
+  TrendingDown,
+  TrendingUp,
+} from 'lucide-react';
 import { NumberField } from './components/NumberField';
 import { SliderField } from './components/SliderField';
 import { StatCard } from './components/StatCard';
@@ -84,13 +92,63 @@ function loadFromStorage<T>(key: string, fallback: T): T {
   }
 }
 
-function App() {
-  const [plan, setPlan] = useState<PlanInput>(() => loadFromStorage(STORAGE_KEY_PLAN, defaultPlan));
-  const [tfsaPlan, setTfsaPlan] = useState<TfsaPlanInput>(() =>
-    loadFromStorage(STORAGE_KEY_TFSA, defaultTfsaPlan)
-  );
+// ── URL state sharing ────────────────────────────────────────────────────────
+// Encode both plans into a single base64 URL param so users can copy/share
+// their exact scenario. URL state takes priority over localStorage on load.
 
-  // Persist whenever state changes
+function encodeState(plan: PlanInput, tfsaPlan: TfsaPlanInput): string {
+  try {
+    return btoa(JSON.stringify({ p: plan, t: tfsaPlan }));
+  } catch {
+    return '';
+  }
+}
+
+function decodeState(
+  encoded: string,
+  fallbackPlan: PlanInput,
+  fallbackTfsa: TfsaPlanInput
+): { plan: PlanInput; tfsaPlan: TfsaPlanInput } | null {
+  try {
+    const raw = JSON.parse(atob(encoded));
+    if (!raw?.p || !raw?.t) return null;
+    return {
+      plan: { ...fallbackPlan, ...raw.p },
+      tfsaPlan: { ...fallbackTfsa, ...raw.t },
+    };
+  } catch {
+    return null;
+  }
+}
+
+function getUrlParam(): string | null {
+  try {
+    return new URLSearchParams(window.location.search).get('s');
+  } catch {
+    return null;
+  }
+}
+
+function App() {
+  const [plan, setPlan] = useState<PlanInput>(() => {
+    const urlParam = getUrlParam();
+    if (urlParam) {
+      const decoded = decodeState(urlParam, defaultPlan, defaultTfsaPlan);
+      if (decoded) return decoded.plan;
+    }
+    return loadFromStorage(STORAGE_KEY_PLAN, defaultPlan);
+  });
+  const [tfsaPlan, setTfsaPlan] = useState<TfsaPlanInput>(() => {
+    const urlParam = getUrlParam();
+    if (urlParam) {
+      const decoded = decodeState(urlParam, defaultPlan, defaultTfsaPlan);
+      if (decoded) return decoded.tfsaPlan;
+    }
+    return loadFromStorage(STORAGE_KEY_TFSA, defaultTfsaPlan);
+  });
+  const [copied, setCopied] = useState(false);
+
+  // Persist to localStorage whenever state changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_PLAN, JSON.stringify(plan));
   }, [plan]);
@@ -98,6 +156,22 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_TFSA, JSON.stringify(tfsaPlan));
   }, [tfsaPlan]);
+
+  // Keep URL in sync so the current scenario is always shareable
+  useEffect(() => {
+    const encoded = encodeState(plan, tfsaPlan);
+    if (!encoded) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set('s', encoded);
+    window.history.replaceState(null, '', url.toString());
+  }, [plan, tfsaPlan]);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   const projection = useMemo(() => calculateProjection(plan), [plan]);
   const summary = useMemo(() => summarizeProjection(projection), [projection]);
@@ -165,6 +239,27 @@ function App() {
     : 0;
   const tenKImpact = contributionMultiplier * 10_000;
   const growthShare = summary.finalBalance ? (summary.totalGrowth / summary.finalBalance) * 100 : 0;
+
+  // ── On-track verdict ────────────────────────────────────────────────────────
+  // Target: 70% income-replacement — the standard retirement planning benchmark.
+  // We use inflation-adjusted safe withdrawal so the comparison is in today's dollars.
+  const combinedInflationAdjustedWithdrawal = combinedInflationAdjusted * 0.04;
+  const targetRetirementIncome = plan.annualIncome * 0.7;
+  const hasIncomeForVerdict = plan.annualIncome > 0;
+  const verdictRatio = hasIncomeForVerdict
+    ? combinedInflationAdjustedWithdrawal / targetRetirementIncome
+    : null;
+  const verdictStatus: 'green' | 'amber' | 'red' =
+    verdictRatio === null
+      ? 'amber'
+      : verdictRatio >= 1
+        ? 'green'
+        : verdictRatio >= 0.7
+          ? 'amber'
+          : 'red';
+  const verdictGap = hasIncomeForVerdict
+    ? combinedInflationAdjustedWithdrawal - targetRetirementIncome
+    : null;
 
   const combinedRows = projection.map((rrspYear, index) => {
     const tfsaYear = tfsaProjection.length
@@ -575,6 +670,99 @@ function App() {
           </section>
 
           <section className="flex flex-col gap-6">
+            {/* ── On-track verdict ── */}
+            <div
+              className={[
+                'rounded-3xl border p-6 shadow-xl shadow-black/30',
+                verdictStatus === 'green'
+                  ? 'border-emerald-500/30 bg-emerald-950/60'
+                  : verdictStatus === 'amber'
+                    ? 'border-amber-500/30 bg-amber-950/60'
+                    : 'border-rose-500/30 bg-rose-950/60',
+              ].join(' ')}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  {verdictStatus === 'green' ? (
+                    <CheckCircle2 className="h-8 w-8 flex-shrink-0 text-emerald-400" />
+                  ) : verdictStatus === 'amber' ? (
+                    <TrendingUp className="h-8 w-8 flex-shrink-0 text-amber-400" />
+                  ) : (
+                    <TrendingDown className="h-8 w-8 flex-shrink-0 text-rose-400" />
+                  )}
+                  <div>
+                    <p
+                      className={[
+                        'text-lg font-semibold',
+                        verdictStatus === 'green'
+                          ? 'text-emerald-300'
+                          : verdictStatus === 'amber'
+                            ? 'text-amber-300'
+                            : 'text-rose-300',
+                      ].join(' ')}
+                    >
+                      {verdictStatus === 'green'
+                        ? "You're on track 🎉"
+                        : verdictStatus === 'amber'
+                          ? hasIncomeForVerdict
+                            ? 'Getting there — a little more goes a long way'
+                            : 'Enter your income to see your retirement score'
+                          : "You're behind — let's close the gap"}
+                    </p>
+                    <p className="mt-1 text-sm text-slate-300">
+                      {hasIncomeForVerdict ? (
+                        <>
+                          Your plan generates{' '}
+                          <span className="font-semibold text-white">
+                            {currency.format(combinedInflationAdjustedWithdrawal)}
+                          </span>{' '}
+                          / year in today's dollars.{' '}
+                          {verdictGap !== null && verdictGap >= 0 ? (
+                            <>
+                              That's{' '}
+                              <span className="font-semibold text-emerald-300">
+                                {currency.format(verdictGap)} more
+                              </span>{' '}
+                              than the 70% income-replacement target of{' '}
+                              {currency.format(targetRetirementIncome)}.
+                            </>
+                          ) : verdictGap !== null ? (
+                            <>
+                              You're{' '}
+                              <span className="font-semibold text-rose-300">
+                                {currency.format(Math.abs(verdictGap))} short
+                              </span>{' '}
+                              of the 70% income-replacement target of{' '}
+                              {currency.format(targetRetirementIncome)}.
+                            </>
+                          ) : null}
+                        </>
+                      ) : (
+                        "Add your annual income above and we'll tell you exactly where you stand."
+                      )}
+                    </p>
+                  </div>
+                </div>
+                {/* Share button */}
+                <button
+                  onClick={handleCopyLink}
+                  title="Copy shareable link"
+                  className="flex flex-shrink-0 items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
+                >
+                  {copied ? (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Link className="h-3.5 w-3.5" />
+                      Share
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
             <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-xl shadow-black/30">
               <p className="text-sm uppercase tracking-wide text-white/70">
                 Plan at a glance (RRSP + TFSA)
