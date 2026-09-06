@@ -147,6 +147,7 @@ function App() {
     return loadFromStorage(STORAGE_KEY_TFSA, defaultTfsaPlan);
   });
   const [copied, setCopied] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Persist to localStorage whenever state changes
   useEffect(() => {
@@ -261,6 +262,37 @@ function App() {
     ? combinedInflationAdjustedWithdrawal - targetRetirementIncome
     : null;
 
+  // ── Cost of waiting 1 year ──────────────────────────────────────────────────
+  // Same plan but starting one year later (age+1, same balance — no contributions
+  // during the gap year). Shows the compound-growth cost of delaying.
+  const waitOnePlan = useMemo(
+    () => ({ ...plan, currentAge: Math.min(plan.currentAge + 1, plan.retirementAge - 1) }),
+    [plan]
+  );
+  const waitOneTfsaPlan = useMemo(() => ({ ...tfsaPlan }), [tfsaPlan]);
+  const waitOneProjection = useMemo(() => calculateProjection(waitOnePlan), [waitOnePlan]);
+  const waitOneSummary = useMemo(() => summarizeProjection(waitOneProjection), [waitOneProjection]);
+  const waitOneTfsaProjection = useMemo(
+    () =>
+      calculateProjection({
+        ...waitOnePlan,
+        currentBalance: waitOneTfsaPlan.currentBalance,
+        contribution: waitOneTfsaPlan.contribution,
+        frequency: waitOneTfsaPlan.frequency,
+        annualReturn: waitOneTfsaPlan.annualReturn,
+        salaryGrowth: 0,
+        employerMatchPercent: 0,
+        employerMatchCap: 0,
+      }),
+    [waitOnePlan, waitOneTfsaPlan]
+  );
+  const waitOneTfsaSummary = useMemo(
+    () => summarizeProjection(waitOneTfsaProjection),
+    [waitOneTfsaProjection]
+  );
+  const waitOneCombinedNestEgg = waitOneSummary.finalBalance + waitOneTfsaSummary.finalBalance;
+  const costOfWaiting = Math.max(0, combinedNestEgg - waitOneCombinedNestEgg);
+
   const combinedRows = projection.map((rrspYear, index) => {
     const tfsaYear = tfsaProjection.length
       ? tfsaProjection[Math.min(index, tfsaProjection.length - 1)]
@@ -337,8 +369,8 @@ function App() {
             See how steady contributions grow into retirement freedom
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-300">
-            Adjust each lever to explore how contribution cadence, market returns, and CRA limits
-            change your long-term balance in today’s dollars.
+            Enter five numbers and see exactly where you stand — then tweak until you like what you
+            see.
           </p>
         </header>
 
@@ -356,7 +388,8 @@ function App() {
               </div>
             </div>
 
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
+            {/* ── Core fields (always visible) ── */}
+            <div className="mt-6 grid gap-6 sm:grid-cols-2">
               <NumberField
                 label="Current age"
                 value={plan.currentAge}
@@ -387,46 +420,7 @@ function App() {
                 min={0}
                 step={1000}
                 onChange={(value) => updatePlan('annualIncome', value)}
-                helper="Used to calculate CRA RRSP deduction room (18% up to $31,560)"
-              />
-              <NumberField
-                label="CRA RRSP room carry-forward (optional)"
-                prefix="$"
-                value={plan.rrspCarryForward ?? 0}
-                min={0}
-                step={500}
-                onChange={(value) => updatePlan('rrspCarryForward', value)}
-                helper="Enter the RRSP room shown on your latest Notice of Assessment"
-              />
-              {carryForwardSeemsLarge && (
-                <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                  <p>
-                    <span className="font-semibold">Carry-forward looks high —</span>{' '}
-                    {currency.format(plan.rrspCarryForward ?? 0)} exceeds a realistic lifetime
-                    accumulation. Double-check your Notice of Assessment figure.
-                  </p>
-                </div>
-              )}
-              <NumberField
-                label="Employer match rate (optional)"
-                suffix="%"
-                value={plan.employerMatchPercent ?? 0}
-                min={0}
-                max={200}
-                step={5}
-                onChange={(value) => updatePlan('employerMatchPercent', value)}
-                helper="e.g. 50 = employer matches 50¢ for every $1 you contribute"
-              />
-              <NumberField
-                label="Employer match cap (optional)"
-                suffix="% of salary"
-                value={plan.employerMatchCap ?? 0}
-                min={0}
-                max={20}
-                step={0.5}
-                onChange={(value) => updatePlan('employerMatchCap', value)}
-                helper="Match stops once it hits this % of your annual salary (0 = no cap)"
+                helper="Used to calculate your RRSP contribution room"
               />
               <div className="space-y-2 text-sm font-medium text-slate-200">
                 <span>Contribution frequency</span>
@@ -449,8 +443,12 @@ function App() {
                 min={0}
                 step={50}
                 onChange={(value) => updatePlan('contribution', value)}
-                helper="Recurring RRSP/RPP deposit made each pay period"
+                helper="Recurring RRSP/RPP deposit each pay period"
               />
+            </div>
+
+            {/* CRA room banner — always visible, relates to core fields */}
+            <div className="mt-4">
               {overContribution ? (
                 <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
                   <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
@@ -458,215 +456,271 @@ function App() {
                     <p className="font-semibold">CRA limit exceeded</p>
                     <p>
                       Annual contributions of {currency.format(annualContribution)} surpass your
-                      estimated RRSP room of {currency.format(maxDeductible)} (base room{' '}
-                      {currency.format(baseDeductionRoom)} + carry-forward{' '}
-                      {currency.format(plan.rrspCarryForward ?? 0)}). Contributions above the limit
-                      are penalized at 1% per month.
+                      estimated RRSP room of {currency.format(maxDeductible)}. Contributions above
+                      the limit are penalized at 1% per month.
                     </p>
                   </div>
                 </div>
               ) : (
                 <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
-                  You have about {currency.format(remainingRoom)} of RRSP room remaining this year,
-                  including carry-forward protection.
-                </div>
-              )}
-              {contributionExceedsIncome && (
-                <div className="col-span-full flex items-start gap-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                  <p>
-                    <span className="font-semibold">Contribution exceeds income —</span> annual
-                    deposits of {currency.format(annualContribution)} are more than your stated
-                    income of {currency.format(plan.annualIncome)}. Check both figures.
-                  </p>
-                </div>
-              )}
-              {matchRateWithoutIncome && (
-                <div className="col-span-full flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                  <p>
-                    <span className="font-semibold">Income required for employer match —</span>{' '}
-                    enter your annual income so the match calculation has a salary to work with.
-                  </p>
-                </div>
-              )}
-              {matchCapWithoutRate && (
-                <div className="col-span-full rounded-2xl border border-slate-500/30 bg-slate-500/10 px-4 py-3 text-sm text-slate-300">
-                  <span className="font-semibold">Match cap set but no match rate —</span> set the
-                  employer match rate above to activate the cap.
-                </div>
-              )}
-              {hasEmployerMatch && (
-                <div className="col-span-full rounded-2xl border border-violet-500/20 bg-violet-500/10 px-4 py-3 text-sm text-violet-100">
-                  <span className="font-semibold">
-                    Employer adds {currency.format(annualEmployerMatch)} / year
-                  </span>
-                  {matchCapRate > 0 && uncappedAnnualMatch > matchCeiling && (
-                    <span className="text-violet-200/80">
-                      {' '}
-                      (capped at {plan.employerMatchCap ?? 0}% of salary)
-                    </span>
-                  )}{' '}
-                  — that's free money already baked into your projection.
+                  You have about{' '}
+                  <span className="font-semibold">{currency.format(remainingRoom)}</span> of RRSP
+                  room remaining this year.
                 </div>
               )}
             </div>
-
-            <div className="mt-8 grid gap-6 md:grid-cols-3">
-              <SliderField
-                label="Expected annual return"
-                value={plan.annualReturn}
-                min={2}
-                max={20}
-                step={0.1}
-                onChange={(value) => updatePlan('annualReturn', value)}
-              />
-              <SliderField
-                label="Inflation (real dollars)"
-                value={plan.inflation}
-                min={1}
-                max={4}
-                step={0.1}
-                onChange={(value) => updatePlan('inflation', value)}
-              />
-              <SliderField
-                label="Salary & contribution growth"
-                value={plan.salaryGrowth}
-                min={0}
-                max={6}
-                step={0.1}
-                onChange={(value) => updatePlan('salaryGrowth', value)}
-              />
-            </div>
-            {negativeRealReturn && (
-              <div className="mt-4 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            {contributionExceedsIncome && (
+              <div className="mt-3 flex items-start gap-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
                 <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <p>
-                  <span className="font-semibold">Negative real return —</span> your expected return
-                  ({plan.annualReturn}%) is at or below inflation ({plan.inflation}%). Your
-                  portfolio will lose purchasing power over time. Consider raising the return rate
-                  or lowering inflation.
-                </p>
-              </div>
-            )}
-            {optimisticReturn && (
-              <div className="mt-4 flex items-start gap-3 rounded-2xl border border-sky-500/20 bg-sky-500/10 px-4 py-3 text-sm text-sky-200">
-                <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                <p>
-                  <span className="font-semibold">Optimistic return assumption —</span>{' '}
-                  {plan.annualReturn}% exceeds the long-run average of most diversified portfolios
-                  (~10%). This is possible but not typical — treat the projection as a best-case
-                  scenario.
+                  <span className="font-semibold">Contribution exceeds income —</span> annual
+                  deposits of {currency.format(annualContribution)} are more than your stated income
+                  of {currency.format(plan.annualIncome)}.
                 </p>
               </div>
             )}
 
-            <div className="mt-10 rounded-3xl border border-white/10 bg-slate-900/40 p-5">
-              <div className="flex items-center justify-between text-white">
-                <div>
-                  <p className="text-sm uppercase tracking-wide text-white/70">TFSA boost</p>
-                  <p className="text-lg font-semibold">Tax-free growth on autopilot</p>
-                  <p className="text-xs text-slate-400">
-                    {`Annual limit: $${TFSA_ANNUAL_LIMIT_2024.toLocaleString()} · All growth stays tax-free.`}
-                  </p>
-                </div>
-              </div>
+            {/* ── Advanced toggle ── */}
+            <button
+              onClick={() => setShowAdvanced((v) => !v)}
+              className="mt-6 flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
+            >
+              <span>{showAdvanced ? 'Hide advanced options' : 'Show advanced options'}</span>
+              <span className="text-lg leading-none">{showAdvanced ? '−' : '+'}</span>
+            </button>
 
-              <div className="mt-5 grid gap-5 md:grid-cols-2">
-                <NumberField
-                  label="Current TFSA balance"
-                  prefix="$"
-                  value={tfsaPlan.currentBalance}
-                  min={0}
-                  step={1000}
-                  onChange={(value) => updateTfsaPlan('currentBalance', value)}
-                />
-                {tfsaBalanceExceedsLifetimeRoom && (
-                  <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            {showAdvanced && (
+              <>
+                {/* ── Rates ── */}
+                <div className="mt-6 grid gap-6 sm:grid-cols-3">
+                  <SliderField
+                    label="Expected annual return"
+                    value={plan.annualReturn}
+                    min={2}
+                    max={20}
+                    step={0.1}
+                    onChange={(value) => updatePlan('annualReturn', value)}
+                  />
+                  <SliderField
+                    label="Inflation rate"
+                    value={plan.inflation}
+                    min={1}
+                    max={4}
+                    step={0.1}
+                    onChange={(value) => updatePlan('inflation', value)}
+                  />
+                  <SliderField
+                    label="Salary growth"
+                    value={plan.salaryGrowth}
+                    min={0}
+                    max={6}
+                    step={0.1}
+                    onChange={(value) => updatePlan('salaryGrowth', value)}
+                  />
+                </div>
+                {negativeRealReturn && (
+                  <div className="mt-4 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
                     <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                     <p>
-                      <span className="font-semibold">Balance exceeds lifetime room —</span> the
-                      cumulative TFSA contribution limit since 2009 is approximately{' '}
-                      {currency.format(TFSA_LIFETIME_ROOM)}. Verify this figure with CRA My Account
-                      to avoid over-contribution penalties.
+                      <span className="font-semibold">Negative real return —</span> your expected
+                      return ({plan.annualReturn}%) is at or below inflation ({plan.inflation}%).
+                      Your portfolio will lose purchasing power over time.
                     </p>
                   </div>
                 )}
-                <NumberField
-                  label={`TFSA contribution per ${tfsaPlan.frequency.replace('bi', 'bi-')}`}
-                  prefix="$"
-                  value={tfsaPlan.contribution}
-                  min={0}
-                  step={50}
-                  onChange={(value) => updateTfsaPlan('contribution', value)}
-                  helper="Counts toward the $7,000 annual limit"
-                />
-                <div className="space-y-2 text-sm font-medium text-slate-200">
-                  <span>TFSA contribution frequency</span>
-                  <select
-                    value={tfsaPlan.frequency}
-                    onChange={(event) =>
-                      updateTfsaPlan('frequency', event.target.value as ContributionFrequency)
-                    }
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base font-semibold text-white outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/40"
-                  >
-                    <option value="monthly">Monthly</option>
-                    <option value="biweekly">Bi-weekly</option>
-                    <option value="weekly">Weekly</option>
-                  </select>
-                </div>
-                <SliderField
-                  label="TFSA annual return"
-                  value={tfsaPlan.annualReturn}
-                  min={2}
-                  max={20}
-                  step={0.1}
-                  onChange={(value) => updateTfsaPlan('annualReturn', value)}
-                />
-              </div>
-
-              <div className="mt-5 grid gap-4 md:grid-cols-3">
-                <StatCard
-                  label="Projected TFSA balance"
-                  value={currency.format(tfsaSummary.finalBalance)}
-                  helper="Nominal dollars at retirement"
-                  tooltip="Projected TFSA balance accounts for your deposits, compound growth, and tax-free status."
-                />
-                <StatCard
-                  label="TFSA total contributions"
-                  value={currency.format(tfsaSummary.totalContributions)}
-                  helper="Deposits you make each year"
-                  tooltip="Total amount you’ll have contributed to your TFSA over the plan horizon."
-                />
-                <StatCard
-                  label="Tax-free income"
-                  value={currency.format(tfsaSafeWithdrawal)}
-                  helper="4% guideline from TFSA alone"
-                  tooltip="Estimated sustainable withdrawal from TFSA only, assuming a 4% draw."
-                />
-              </div>
-
-              <div className="mt-5">
-                {tfsaOverContribution ? (
-                  <div className="flex items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                {optimisticReturn && (
+                  <div className="mt-4 flex items-start gap-3 rounded-2xl border border-sky-500/20 bg-sky-500/10 px-4 py-3 text-sm text-sky-200">
                     <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-                    <div>
-                      <p className="font-semibold">TFSA limit exceeded</p>
-                      <p>
-                        Depositing {currency.format(tfsaAnnualContribution)} per year exceeds the{' '}
-                        {`$${TFSA_ANNUAL_LIMIT_2024.toLocaleString()}`} room. CRA taxes the overflow
-                        at 1% per month until withdrawn.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="rounded-2xl border border-sky-500/30 bg-sky-500/10 px-4 py-3 text-sm text-slate-100">
-                    You still have {currency.format(tfsaRemainingRoom)} of TFSA space for the year.
-                    Staying consistent keeps all growth tax-free.
+                    <p>
+                      <span className="font-semibold">Optimistic assumption —</span>{' '}
+                      {plan.annualReturn}% exceeds the long-run average of most diversified
+                      portfolios (~10%). Treat this as a best-case scenario.
+                    </p>
                   </div>
                 )}
-              </div>
-            </div>
+
+                {/* ── Employer match ── */}
+                <div className="mt-6 grid gap-6 sm:grid-cols-2">
+                  <NumberField
+                    label="Employer match rate"
+                    suffix="%"
+                    value={plan.employerMatchPercent ?? 0}
+                    min={0}
+                    max={200}
+                    step={5}
+                    onChange={(value) => updatePlan('employerMatchPercent', value)}
+                    helper="e.g. 50 = employer matches 50¢ for every $1 you contribute"
+                  />
+                  <NumberField
+                    label="Employer match cap"
+                    suffix="% of salary"
+                    value={plan.employerMatchCap ?? 0}
+                    min={0}
+                    max={20}
+                    step={0.5}
+                    onChange={(value) => updatePlan('employerMatchCap', value)}
+                    helper="Match stops once it hits this % of your annual salary (0 = no cap)"
+                  />
+                </div>
+                {matchRateWithoutIncome && (
+                  <div className="mt-3 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <p>
+                      <span className="font-semibold">Income required for employer match —</span>{' '}
+                      enter your annual income so the match can be calculated.
+                    </p>
+                  </div>
+                )}
+                {matchCapWithoutRate && (
+                  <div className="mt-3 rounded-2xl border border-slate-500/30 bg-slate-500/10 px-4 py-3 text-sm text-slate-300">
+                    <span className="font-semibold">Match cap set but no match rate —</span> set the
+                    employer match rate to activate the cap.
+                  </div>
+                )}
+                {hasEmployerMatch && (
+                  <div className="mt-3 rounded-2xl border border-violet-500/20 bg-violet-500/10 px-4 py-3 text-sm text-violet-100">
+                    <span className="font-semibold">
+                      Employer adds {currency.format(annualEmployerMatch)} / year
+                    </span>
+                    {matchCapRate > 0 && uncappedAnnualMatch > matchCeiling && (
+                      <span className="text-violet-200/80">
+                        {' '}
+                        (capped at {plan.employerMatchCap ?? 0}% of salary)
+                      </span>
+                    )}{' '}
+                    — free money baked into your projection.
+                  </div>
+                )}
+
+                {/* ── RRSP carry-forward ── */}
+                <div className="mt-6 grid gap-6 sm:grid-cols-2">
+                  <NumberField
+                    label="RRSP room carry-forward"
+                    prefix="$"
+                    value={plan.rrspCarryForward ?? 0}
+                    min={0}
+                    step={500}
+                    onChange={(value) => updatePlan('rrspCarryForward', value)}
+                    helper="From your latest CRA Notice of Assessment"
+                  />
+                </div>
+                {carryForwardSeemsLarge && (
+                  <div className="mt-3 flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                    <p>
+                      <span className="font-semibold">Carry-forward looks high —</span>{' '}
+                      {currency.format(plan.rrspCarryForward ?? 0)} exceeds a realistic lifetime
+                      accumulation. Double-check your Notice of Assessment.
+                    </p>
+                  </div>
+                )}
+
+                {/* ── TFSA ── */}
+                <div className="mt-8 rounded-3xl border border-white/10 bg-slate-900/40 p-5">
+                  <div>
+                    <p className="text-sm uppercase tracking-wide text-white/70">TFSA boost</p>
+                    <p className="text-lg font-semibold text-white">Tax-free growth on autopilot</p>
+                    <p className="text-xs text-slate-400">
+                      {`Annual limit: $${TFSA_ANNUAL_LIMIT_2024.toLocaleString()} · All growth stays tax-free.`}
+                    </p>
+                  </div>
+
+                  <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                    <NumberField
+                      label="Current TFSA balance"
+                      prefix="$"
+                      value={tfsaPlan.currentBalance}
+                      min={0}
+                      step={1000}
+                      onChange={(value) => updateTfsaPlan('currentBalance', value)}
+                    />
+                    {tfsaBalanceExceedsLifetimeRoom && (
+                      <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+                        <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                        <p>
+                          <span className="font-semibold">Exceeds lifetime room —</span> cumulative
+                          TFSA limit since 2009 is ~{currency.format(TFSA_LIFETIME_ROOM)}. Verify
+                          with CRA My Account.
+                        </p>
+                      </div>
+                    )}
+                    <NumberField
+                      label={`TFSA contribution per ${tfsaPlan.frequency.replace('bi', 'bi-')}`}
+                      prefix="$"
+                      value={tfsaPlan.contribution}
+                      min={0}
+                      step={50}
+                      onChange={(value) => updateTfsaPlan('contribution', value)}
+                      helper="Counts toward the $7,000 annual limit"
+                    />
+                    <div className="space-y-2 text-sm font-medium text-slate-200">
+                      <span>TFSA contribution frequency</span>
+                      <select
+                        value={tfsaPlan.frequency}
+                        onChange={(event) =>
+                          updateTfsaPlan('frequency', event.target.value as ContributionFrequency)
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base font-semibold text-white outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/40"
+                      >
+                        <option value="monthly">Monthly</option>
+                        <option value="biweekly">Bi-weekly</option>
+                        <option value="weekly">Weekly</option>
+                      </select>
+                    </div>
+                    <SliderField
+                      label="TFSA annual return"
+                      value={tfsaPlan.annualReturn}
+                      min={2}
+                      max={20}
+                      step={0.1}
+                      onChange={(value) => updateTfsaPlan('annualReturn', value)}
+                    />
+                  </div>
+
+                  <div className="mt-5 grid gap-4 sm:grid-cols-3">
+                    <StatCard
+                      label="Projected TFSA balance"
+                      value={currency.format(tfsaSummary.finalBalance)}
+                      helper="Nominal dollars at retirement"
+                      tooltip="Projected TFSA balance at retirement."
+                    />
+                    <StatCard
+                      label="TFSA contributions"
+                      value={currency.format(tfsaSummary.totalContributions)}
+                      helper="Total deposits over the plan"
+                      tooltip="Total amount you'll have deposited into your TFSA."
+                    />
+                    <StatCard
+                      label="Tax-free income"
+                      value={currency.format(tfsaSafeWithdrawal)}
+                      helper="4% guideline from TFSA alone"
+                      tooltip="Estimated sustainable annual withdrawal from TFSA only."
+                    />
+                  </div>
+
+                  <div className="mt-5">
+                    {tfsaOverContribution ? (
+                      <div className="flex items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                        <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold">TFSA limit exceeded</p>
+                          <p>
+                            Depositing {currency.format(tfsaAnnualContribution)} per year exceeds
+                            the {`$${TFSA_ANNUAL_LIMIT_2024.toLocaleString()}`} room. CRA taxes the
+                            overflow at 1% per month until withdrawn.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl border border-sky-500/30 bg-sky-500/10 px-4 py-3 text-sm text-slate-100">
+                        You still have {currency.format(tfsaRemainingRoom)} of TFSA space for the
+                        year. Staying consistent keeps all growth tax-free.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </section>
 
           <section className="flex flex-col gap-6">
@@ -763,6 +817,31 @@ function App() {
                 </button>
               </div>
             </div>
+
+            {/* ── Cost of waiting 1 year ── */}
+            {costOfWaiting > 0 && (
+              <div className="rounded-3xl border border-orange-500/20 bg-orange-950/40 p-6 shadow-xl shadow-black/30">
+                <p className="text-sm uppercase tracking-wide text-orange-300">
+                  The cost of waiting
+                </p>
+                <p className="mt-2 text-4xl font-semibold text-white">
+                  {currency.format(costOfWaiting)}
+                </p>
+                <p className="mt-2 text-sm text-slate-300">
+                  That's how much less you'd have at retirement if you started{' '}
+                  <span className="font-semibold text-orange-300">one year from now</span> instead
+                  of today. Every month you delay, compound growth works against you instead of for
+                  you.
+                </p>
+                <p className="mt-3 text-xs text-slate-400">
+                  Equivalent to{' '}
+                  <span className="font-semibold text-white">
+                    {currency.format((costOfWaiting * 0.04) / 12)}
+                  </span>{' '}
+                  less per month in retirement income — forever.
+                </p>
+              </div>
+            )}
             <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-xl shadow-black/30">
               <p className="text-sm uppercase tracking-wide text-white/70">
                 Plan at a glance (RRSP + TFSA)
