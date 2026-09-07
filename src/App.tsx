@@ -141,6 +141,10 @@ function App() {
     return loadFromStorage(STORAGE_KEY_TFSA, defaultTfsaPlan);
   });
   const [reverseTargetIncome, setReverseTargetIncome] = useState(100000);
+  // null = no manual override, so the target tracks 70% of income automatically.
+  // Once the user edits it directly, it locks to that dollar figure and stops
+  // following income changes — same reasoning as Set a Goal's fixed target.
+  const [verdictTargetOverride, setVerdictTargetOverride] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -209,8 +213,11 @@ function App() {
   // Verdict logic
   const combinedInflationAdjustedWithdrawal = combinedInflationAdjusted * 0.04;
   const hasIncomeForVerdict = plan.annualIncome > 0;
+  // Defaults to 70% of income (the standard income-replacement benchmark),
+  // but the user can override it with a specific dollar target in Full Control.
+  const targetRetirementIncome = verdictTargetOverride ?? plan.annualIncome * 0.7;
   const verdictRatio = hasIncomeForVerdict
-    ? combinedInflationAdjustedWithdrawal / (plan.annualIncome * 0.7)
+    ? combinedInflationAdjustedWithdrawal / targetRetirementIncome
     : null;
   const verdictStatus: 'green' | 'amber' | 'red' =
     verdictRatio === null
@@ -220,7 +227,6 @@ function App() {
         : verdictRatio >= 0.7
           ? 'amber'
           : 'red';
-  const targetRetirementIncome = plan.annualIncome * 0.7;
   const verdictGap = hasIncomeForVerdict
     ? combinedInflationAdjustedWithdrawal - targetRetirementIncome
     : null;
@@ -494,6 +500,30 @@ function App() {
           onChange={(value) => updatePlan('annualIncome', value)}
           helper="Used for RRSP room and your on-track score below"
         />
+      </div>
+
+      <div>
+        <NumberField
+          label="Target retirement income"
+          prefix="$"
+          value={targetRetirementIncome}
+          min={0}
+          step={1000}
+          onChange={(value) => setVerdictTargetOverride(value)}
+          helper={
+            verdictTargetOverride === null
+              ? 'Defaults to 70% of your income — edit to set your own goal'
+              : undefined
+          }
+        />
+        {verdictTargetOverride !== null && (
+          <button
+            onClick={() => setVerdictTargetOverride(null)}
+            className="mt-2 text-xs font-medium text-brand hover:text-brand-dark transition"
+          >
+            Reset to 70% of income →
+          </button>
+        )}
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
