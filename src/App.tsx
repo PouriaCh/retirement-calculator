@@ -773,12 +773,17 @@ function App() {
                     </p>
                   </div>
                   <div className="border-t border-brand/20 pt-4">
-                    <p className="text-sm text-slate-300">You need to save (per month)</p>
+                    <p className="text-sm text-slate-300">
+                      You need to save (per{' '}
+                      {plan.frequency === 'biweekly'
+                        ? 'bi-weekly paycheck'
+                        : plan.frequency === 'weekly'
+                          ? 'week'
+                          : 'month'}
+                      )
+                    </p>
                     <p className="text-3xl font-semibold text-brand mt-1">
                       {currency.format(requiredMonthlyForTarget)}
-                    </p>
-                    <p className="text-xs text-slate-400 mt-2">
-                      Frequency: {plan.frequency === 'biweekly' ? 'Bi-weekly' : plan.frequency}
                     </p>
                   </div>
                 </div>
@@ -804,32 +809,36 @@ function App() {
               </div>
             )}
 
-            {/* Assumptions */}
-            <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-6">
-              <p className="text-xs uppercase tracking-wide text-slate-400 mb-4">How we got here</p>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-300">Expected annual return</span>
-                  <span className="font-semibold text-white">{plan.annualReturn}%</span>
+            {/* Assumptions (hidden in Reverse mode) */}
+            {mode !== 'reverse' && (
+              <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-6">
+                <p className="text-xs uppercase tracking-wide text-slate-400 mb-4">
+                  How we got here
+                </p>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300">Expected annual return</span>
+                    <span className="font-semibold text-white">{plan.annualReturn}%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300">Inflation rate</span>
+                    <span className="font-semibold text-white">{plan.inflation}%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300">Salary growth</span>
+                    <span className="font-semibold text-white">{plan.salaryGrowth}%</span>
+                  </div>
+                  {mode === 'quick' && (
+                    <button
+                      onClick={() => setMode('customize')}
+                      className="mt-4 w-full text-xs font-medium text-brand hover:text-brand/80 transition"
+                    >
+                      Change assumptions →
+                    </button>
+                  )}
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-300">Inflation rate</span>
-                  <span className="font-semibold text-white">{plan.inflation}%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-300">Salary growth</span>
-                  <span className="font-semibold text-white">{plan.salaryGrowth}%</span>
-                </div>
-                {mode === 'quick' && (
-                  <button
-                    onClick={() => setMode('customize')}
-                    className="mt-4 w-full text-xs font-medium text-brand hover:text-brand/80 transition"
-                  >
-                    Change assumptions →
-                  </button>
-                )}
               </div>
-            </div>
+            )}
 
             {/* Expand details */}
             {mode !== 'reverse' && (
