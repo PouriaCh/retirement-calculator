@@ -27,7 +27,7 @@ const currencyFormatter = new Intl.NumberFormat('en-CA', {
 
 export const BalanceMiniChart = ({ data, label, color }: BalanceMiniChartProps) => {
   if (!data.length) {
-    return <p className="text-sm text-slate-400">Add contributions to preview {label} growth.</p>;
+    return <p className="text-sm text-slate-500">Add contributions to preview {label} growth.</p>;
   }
 
   const chartData = {

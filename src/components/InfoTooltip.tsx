@@ -20,7 +20,7 @@ export const InfoTooltip = ({ label, children }: PropsWithChildren<InfoTooltipPr
     >
       <Info className="h-4 w-4 text-slate-400" />
       {visible ? (
-        <div className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 w-56 -translate-x-1/2 rounded-xl border border-white/10 bg-slate-900/95 px-3 py-2 text-xs text-slate-200 shadow-xl">
+        <div className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 w-56 -translate-x-1/2 rounded-xl border border-white/10 bg-slate-900/95 px-3 py-2 text-xs text-slate-200 shadow-xl shadow-slate-900/20">
           {children}
         </div>
       ) : null}

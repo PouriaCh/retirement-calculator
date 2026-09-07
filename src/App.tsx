@@ -284,8 +284,8 @@ function App() {
   const renderQuickStart = () => (
     <div className="space-y-6">
       <div>
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 1 of 5</p>
-        <h3 className="font-heading mt-2 text-lg font-semibold text-white">How old are you?</h3>
+        <p className="text-sm uppercase tracking-wide text-slate-500">Step 1 of 4</p>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-slate-900">How old are you?</h3>
       </div>
       <NumberField
         label="Current age"
@@ -296,8 +296,8 @@ function App() {
       />
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 2 of 5</p>
-        <h3 className="font-heading mt-2 text-lg font-semibold text-white">
+        <p className="text-sm uppercase tracking-wide text-slate-500">Step 2 of 4</p>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-slate-900">
           When do you want to retire?
         </h3>
       </div>
@@ -310,8 +310,8 @@ function App() {
       />
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 3 of 4</p>
-        <h3 className="font-heading mt-2 text-lg font-semibold text-white">
+        <p className="text-sm uppercase tracking-wide text-slate-500">Step 3 of 4</p>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-slate-900">
           How much have you saved so far?
         </h3>
       </div>
@@ -325,8 +325,8 @@ function App() {
       />
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 4 of 4</p>
-        <h3 className="font-heading mt-2 text-lg font-semibold text-white">
+        <p className="text-sm uppercase tracking-wide text-slate-500">Step 4 of 4</p>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-slate-900">
           How much can you save?
         </h3>
       </div>
@@ -350,10 +350,12 @@ function App() {
   const renderReverse = () => (
     <div className="space-y-6">
       <div>
-        <p className="text-sm uppercase tracking-wide text-slate-400">
+        <p className="text-sm uppercase tracking-wide text-slate-500">
           Your target retirement income
         </p>
-        <h3 className="font-heading mt-2 text-lg font-semibold text-white">How much per year?</h3>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-slate-900">
+          How much per year?
+        </h3>
       </div>
       <NumberField
         label="Target annual retirement income"
@@ -366,8 +368,10 @@ function App() {
       />
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Your timeline</p>
-        <h3 className="font-heading mt-2 text-lg font-semibold text-white">When do you retire?</h3>
+        <p className="text-sm uppercase tracking-wide text-slate-500">Your timeline</p>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-slate-900">
+          When do you retire?
+        </h3>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <NumberField
@@ -387,8 +391,8 @@ function App() {
       </div>
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Your starting point</p>
-        <h3 className="font-heading mt-2 text-lg font-semibold text-white">
+        <p className="text-sm uppercase tracking-wide text-slate-500">Your starting point</p>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-slate-900">
           What do you have now?
         </h3>
       </div>
@@ -401,25 +405,25 @@ function App() {
         onChange={(value) => updatePlan('currentBalance', value)}
       />
 
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-        <p className="text-xs uppercase tracking-wide text-slate-400 mb-3">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-xs uppercase tracking-wide text-slate-500 mb-3">
           Factored into calculation
         </p>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-300">Expected return</span>
+              <span className="text-slate-600">Expected return</span>
               <InfoTooltip label="What is expected return?">
                 The assumed annual growth rate of your investments. This is what turns your
                 contributions into a bigger nest egg over time — a higher rate means faster growth,
                 but also more risk.
               </InfoTooltip>
             </div>
-            <span className="font-semibold text-white">{plan.annualReturn}%</span>
+            <span className="font-semibold text-slate-900">{plan.annualReturn}%</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-300">Inflation</span>
+              <span className="text-slate-600">Inflation</span>
               <InfoTooltip label="What is inflation used for?">
                 Prices rise over time, so money loses buying power. This is how much we assume
                 prices rise per year — it's what makes your ${reverseTargetIncome.toLocaleString()}{' '}
@@ -427,18 +431,18 @@ function App() {
                 retire.
               </InfoTooltip>
             </div>
-            <span className="font-semibold text-white">{plan.inflation}%</span>
+            <span className="font-semibold text-slate-900">{plan.inflation}%</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-300">Contribution frequency</span>
-            <span className="font-semibold text-white capitalize">
+            <span className="text-slate-600">Contribution frequency</span>
+            <span className="font-semibold text-slate-900 capitalize">
               {plan.frequency === 'biweekly' ? 'Bi-weekly' : plan.frequency}
             </span>
           </div>
         </div>
         <button
           onClick={() => setMode('customize')}
-          className="mt-4 w-full text-xs font-medium text-brand hover:text-brand/80 transition"
+          className="mt-4 w-full text-xs font-medium text-brand hover:text-brand-dark transition"
         >
           Adjust assumptions →
         </button>
@@ -451,7 +455,7 @@ function App() {
       {/* Back to Reverse button (if user came from Reverse) */}
       <button
         onClick={() => setMode('reverse')}
-        className="flex items-center gap-2 text-sm font-medium text-brand hover:text-brand/80 transition"
+        className="flex items-center gap-2 text-sm font-medium text-brand hover:text-brand-dark transition"
       >
         ← Back to target calculation
       </button>
@@ -493,14 +497,14 @@ function App() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <div className="space-y-2 text-sm font-medium text-slate-200">
+        <div className="space-y-2 text-sm font-medium text-slate-700">
           <span>Contribution frequency</span>
           <select
             value={plan.frequency}
             onChange={(event) =>
               updatePlan('frequency', event.target.value as PlanInput['frequency'])
             }
-            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base font-semibold text-white outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/40"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base font-semibold text-slate-900 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30"
           >
             <option value="monthly">Monthly</option>
             <option value="biweekly">Bi-weekly</option>
@@ -518,8 +522,8 @@ function App() {
       </div>
 
       {/* Rates */}
-      <div className="border-t border-white/10 pt-6">
-        <p className="text-sm font-semibold uppercase tracking-wide text-slate-300">Assumptions</p>
+      <div className="border-t border-slate-200 pt-6">
+        <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Assumptions</p>
         <div className="mt-4 grid gap-6 sm:grid-cols-3">
           <SliderField
             label="Expected return"
@@ -554,7 +558,7 @@ function App() {
       {/* Advanced toggle */}
       <button
         onClick={() => setShowAdvanced((v) => !v)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
+        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
       >
         <span className="flex items-center justify-between">
           <span>{showAdvanced ? 'Hide advanced' : 'Show advanced'}</span>
@@ -565,8 +569,8 @@ function App() {
       {showAdvanced && (
         <>
           {/* Employer match */}
-          <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-sm font-semibold text-white">Employer match</p>
+          <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-semibold text-slate-900">Employer match</p>
             <NumberField
               label="Match rate (%)"
               suffix="%"
@@ -590,8 +594,8 @@ function App() {
           </div>
 
           {/* RRSP carry-forward */}
-          <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-sm font-semibold text-white">RRSP carry-forward</p>
+          <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-semibold text-slate-900">RRSP carry-forward</p>
             <NumberField
               label="CRA deduction room"
               prefix="$"
@@ -604,8 +608,8 @@ function App() {
           </div>
 
           {/* TFSA */}
-          <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-sm font-semibold text-white">TFSA</p>
+          <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-semibold text-slate-900">TFSA</p>
             <NumberField
               label="Current TFSA balance"
               prefix="$"
@@ -638,30 +642,30 @@ function App() {
   );
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 py-10">
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-slate-50 to-blue-50 py-10">
       {/* Decorative glow — adds depth/warmth behind the hero without any image assets */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 left-1/2 h-[32rem] w-[32rem] -translate-x-[60%] rounded-full bg-brand/20 blur-[120px]"
+        className="pointer-events-none absolute -top-32 left-1/2 h-[32rem] w-[32rem] -translate-x-[60%] rounded-full bg-brand/15 blur-[120px]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-16 right-1/2 h-[26rem] w-[26rem] translate-x-[70%] rounded-full bg-emerald-500/10 blur-[120px]"
+        className="pointer-events-none absolute -top-16 right-1/2 h-[26rem] w-[26rem] translate-x-[70%] rounded-full bg-emerald-400/10 blur-[120px]"
       />
       <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-4">
         {/* Header */}
         <header className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-sky-200">
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-brand-dark">
             <PiggyBank className="h-3.5 w-3.5 text-brand" />
             Free · Private · No signup
           </div>
-          <h1 className="font-heading mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+          <h1 className="font-heading mt-6 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
             Will you be ready to{' '}
-            <span className="bg-gradient-to-r from-sky-300 to-emerald-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand to-emerald-500 bg-clip-text text-transparent">
               retire?
             </span>
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-300">
+          <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-600">
             4 questions. 30 seconds. Nothing you enter ever leaves your browser.
           </p>
         </header>
@@ -678,8 +682,8 @@ function App() {
               onClick={() => setMode(m.id)}
               className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition ${
                 mode === m.id
-                  ? 'border-brand bg-brand/20 text-brand'
-                  : 'border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+                  ? 'border-brand bg-brand/10 text-brand'
+                  : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
               }`}
             >
               <span>{m.icon}</span>
@@ -691,13 +695,13 @@ function App() {
         {/* Main content */}
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           {/* Form */}
-          <section className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-            <div className="flex items-center gap-2 text-white mb-6">
-              <div className="rounded-xl bg-brand/20 p-2 text-brand">
+          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60">
+            <div className="mb-6 flex items-center gap-2 text-slate-900">
+              <div className="rounded-xl bg-brand/10 p-2 text-brand">
                 <Calculator className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-400">Enter your info</p>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Enter your info</p>
                 <p className="font-semibold">
                   {mode === 'quick'
                     ? 'Quick Start'
@@ -718,33 +722,33 @@ function App() {
             {/* Verdict (only shown in Customize mode, where income is collected) */}
             {mode === 'customize' && (
               <div
-                className={`rounded-3xl border p-6 shadow-xl shadow-black/30 ${
+                className={`rounded-3xl border p-6 shadow-lg shadow-slate-200/60 ${
                   verdictStatus === 'green'
-                    ? 'border-emerald-500/30 bg-emerald-950/60'
+                    ? 'border-emerald-300 bg-emerald-50'
                     : verdictStatus === 'amber'
-                      ? 'border-amber-500/30 bg-amber-950/60'
-                      : 'border-rose-500/30 bg-rose-950/60'
+                      ? 'border-amber-300 bg-amber-50'
+                      : 'border-rose-300 bg-rose-50'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     {verdictStatus === 'green' && (
-                      <CheckCircle2 className="h-8 w-8 text-emerald-400 flex-shrink-0" />
+                      <CheckCircle2 className="h-8 w-8 text-emerald-500 flex-shrink-0" />
                     )}
                     {verdictStatus === 'amber' && (
-                      <TrendingUp className="h-8 w-8 text-amber-400 flex-shrink-0" />
+                      <TrendingUp className="h-8 w-8 text-amber-500 flex-shrink-0" />
                     )}
                     {verdictStatus === 'red' && (
-                      <TrendingDown className="h-8 w-8 text-rose-400 flex-shrink-0" />
+                      <TrendingDown className="h-8 w-8 text-rose-500 flex-shrink-0" />
                     )}
                     <div>
                       <p
                         className={`font-heading text-lg font-semibold ${
                           verdictStatus === 'green'
-                            ? 'text-emerald-300'
+                            ? 'text-emerald-700'
                             : verdictStatus === 'amber'
-                              ? 'text-amber-300'
-                              : 'text-rose-300'
+                              ? 'text-amber-700'
+                              : 'text-rose-700'
                         }`}
                       >
                         {verdictStatus === 'green'
@@ -755,15 +759,15 @@ function App() {
                               : 'Verdict pending'
                             : "You're behind — close the gap"}
                       </p>
-                      <p className="mt-1 text-sm text-slate-300">
+                      <p className="mt-1 text-sm text-slate-600">
                         {hasIncomeForVerdict ? (
                           <>
                             Your plan generates{' '}
-                            <span className="font-semibold text-white">
+                            <span className="font-semibold text-slate-900">
                               {currency.format(animatedRetirementIncome)}
                             </span>{' '}
                             / year. Target:{' '}
-                            <span className="font-semibold text-white">
+                            <span className="font-semibold text-slate-900">
                               {currency.format(targetRetirementIncome)}
                             </span>{' '}
                             (70% of income)
@@ -776,11 +780,11 @@ function App() {
                   </div>
                   <button
                     onClick={handleCopyLink}
-                    className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 transition"
+                    className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
                   >
                     {copied ? (
                       <>
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                         Copied
                       </>
                     ) : (
@@ -796,19 +800,19 @@ function App() {
 
             {/* Reverse mode: Target + Required savings + Nest egg needed */}
             {mode === 'reverse' && (
-              <div className="rounded-3xl border border-brand/30 bg-brand/10 p-6 shadow-xl shadow-black/30">
+              <div className="rounded-3xl border border-brand/30 bg-brand/5 p-6 shadow-lg shadow-slate-200/60">
                 <p className="text-xs uppercase tracking-wide text-brand mb-2">Your savings goal</p>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm text-slate-300">Target annual income at retirement</p>
-                    <p className="font-heading mt-1 text-3xl font-semibold text-white">
+                    <p className="text-sm text-slate-600">Target annual income at retirement</p>
+                    <p className="font-heading mt-1 text-3xl font-semibold text-slate-900">
                       {currency.format(reverseTargetIncome)}
                     </p>
-                    <p className="text-xs text-slate-400 mt-2">In today's dollars</p>
+                    <p className="text-xs text-slate-500 mt-2">In today's dollars</p>
                   </div>
                   <div className="border-t border-brand/20 pt-4">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm text-slate-300">Nest egg needed (4% rule)</p>
+                      <p className="text-sm text-slate-600">Nest egg needed (4% rule)</p>
                       <InfoTooltip label="What is the 4% rule?">
                         A widely-used rule of thumb: withdrawing 4% of your savings per year is
                         generally considered sustainable over a 30-year retirement without running
@@ -819,13 +823,13 @@ function App() {
                     <p className="font-heading mt-1 text-2xl font-semibold text-brand">
                       {currency.format(animatedNestEggNeeded)}
                     </p>
-                    <p className="text-xs text-slate-400 mt-2">
+                    <p className="text-xs text-slate-500 mt-2">
                       {(reverseTargetIncome / 0.04).toLocaleString()} × 4% ={' '}
                       {reverseTargetIncome.toLocaleString()}
                     </p>
                   </div>
                   <div className="border-t border-brand/20 pt-4">
-                    <p className="text-sm text-slate-300">
+                    <p className="text-sm text-slate-600">
                       You need to save (per{' '}
                       {plan.frequency === 'biweekly'
                         ? 'bi-weekly paycheck'
@@ -844,17 +848,17 @@ function App() {
 
             {/* Key stats (hidden in Reverse mode) */}
             {mode !== 'reverse' && (
-              <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-900 to-brand/10 p-6 shadow-xl shadow-black/30">
+              <div className="rounded-3xl border border-brand/20 bg-gradient-to-br from-white via-white to-brand/10 p-6 shadow-lg shadow-slate-200/60">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs uppercase tracking-wide text-slate-400">Your nest egg</p>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Your nest egg</p>
                   {mode === 'quick' && (
                     <button
                       onClick={handleCopyLink}
-                      className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 transition"
+                      className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 transition"
                     >
                       {copied ? (
                         <>
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                           Copied
                         </>
                       ) : (
@@ -887,22 +891,22 @@ function App() {
 
             {/* Assumptions (only shown in Customize mode) */}
             {mode === 'customize' && (
-              <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-6">
-                <p className="text-xs uppercase tracking-wide text-slate-400 mb-4">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                <p className="text-xs uppercase tracking-wide text-slate-500 mb-4">
                   How we got here
                 </p>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-300">Expected annual return</span>
-                    <span className="font-semibold text-white">{plan.annualReturn}%</span>
+                    <span className="text-slate-600">Expected annual return</span>
+                    <span className="font-semibold text-slate-900">{plan.annualReturn}%</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-300">Inflation rate</span>
-                    <span className="font-semibold text-white">{plan.inflation}%</span>
+                    <span className="text-slate-600">Inflation rate</span>
+                    <span className="font-semibold text-slate-900">{plan.inflation}%</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-300">Salary growth</span>
-                    <span className="font-semibold text-white">{plan.salaryGrowth}%</span>
+                    <span className="text-slate-600">Salary growth</span>
+                    <span className="font-semibold text-slate-900">{plan.salaryGrowth}%</span>
                   </div>
                 </div>
               </div>
@@ -911,7 +915,7 @@ function App() {
             {/* Expand details */}
             {mode !== 'reverse' && (
               <button
-                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-300 hover:bg-white/10 transition"
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
                 onClick={() => setMode('customize')}
               >
                 See full breakdown →
@@ -922,24 +926,26 @@ function App() {
 
         {/* Charts section (only in customize mode) */}
         {mode === 'customize' && (
-          <section className="rounded-3xl border border-white/5 bg-slate-900/70 p-6 shadow-2xl shadow-black/30">
-            <h2 className="font-heading text-xl font-semibold text-white">Your growth journey</h2>
-            <p className="text-sm text-slate-400 mt-1">
+          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60">
+            <h2 className="font-heading text-xl font-semibold text-slate-900">
+              Your growth journey
+            </h2>
+            <p className="text-sm text-slate-500 mt-1">
               {plan.retirementAge - plan.currentAge} years · balances update instantly
             </p>
 
             <div className="mt-6 grid gap-4 lg:grid-cols-3">
-              <div className="rounded-3xl border border-white/5 bg-gradient-to-b from-slate-900 to-slate-950/80 p-4 lg:col-span-3">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 lg:col-span-3">
                 <ProjectionChart data={projection} />
               </div>
-              <div className="rounded-3xl border border-white/5 bg-slate-950/70 p-4">
-                <p className="text-sm font-semibold text-white">RRSP growth</p>
-                <p className="text-xs text-slate-400">Balance over time</p>
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-semibold text-slate-900">RRSP growth</p>
+                <p className="text-xs text-slate-500">Balance over time</p>
                 <BalanceMiniChart data={projection} label="RRSP balance" color="#1F8EF1" />
               </div>
-              <div className="rounded-3xl border border-white/5 bg-slate-950/70 p-4">
-                <p className="text-sm font-semibold text-white">TFSA growth</p>
-                <p className="text-xs text-slate-400">Balance over time</p>
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-semibold text-slate-900">TFSA growth</p>
+                <p className="text-xs text-slate-500">Balance over time</p>
                 <BalanceMiniChart data={tfsaProjection} label="TFSA balance" color="#C084FC" />
               </div>
             </div>
@@ -952,7 +958,7 @@ function App() {
             No signup. No data ever leaves your browser. Free, always.{' '}
             <button
               onClick={() => setMode('customize')}
-              className="underline underline-offset-2 hover:text-slate-300 transition"
+              className="underline underline-offset-2 hover:text-brand transition"
             >
               Includes RRSP &amp; TFSA support for Canadian accounts
             </button>

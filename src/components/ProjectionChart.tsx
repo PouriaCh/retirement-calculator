@@ -27,7 +27,7 @@ const currencyFormatter = new Intl.NumberFormat('en-CA', {
 export const ProjectionChart = ({ data }: ProjectionChartProps) => {
   if (!data.length) {
     return (
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-slate-500">
         Add a contribution plan to preview your retirement balance.
       </p>
     );
@@ -72,7 +72,7 @@ export const ProjectionChart = ({ data }: ProjectionChartProps) => {
       legend: {
         position: 'bottom' as const,
         labels: {
-          color: '#CBD5F5',
+          color: '#334155',
           usePointStyle: true,
         },
       },
@@ -86,18 +86,18 @@ export const ProjectionChart = ({ data }: ProjectionChartProps) => {
     },
     scales: {
       x: {
-        ticks: { color: '#94A3B8' },
-        grid: { color: 'rgba(148,163,184,0.2)' },
+        ticks: { color: '#64748B' },
+        grid: { color: 'rgba(100,116,139,0.15)' },
       },
       y: {
         ticks: {
-          color: '#94A3B8',
+          color: '#64748B',
           callback(value: string | number) {
             if (typeof value === 'string') return value;
             return `${Math.round(Number(value) / 1000)}k`;
           },
         },
-        grid: { color: 'rgba(148,163,184,0.2)' },
+        grid: { color: 'rgba(100,116,139,0.15)' },
       },
     },
   };

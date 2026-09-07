@@ -32,12 +32,12 @@ export const SliderField = ({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between text-sm text-slate-300">
+      <div className="flex items-center justify-between text-sm text-slate-600">
         <span className="flex items-center gap-1.5 font-medium">
           {label}
           {tooltip ? <InfoTooltip label={label}>{tooltip}</InfoTooltip> : null}
         </span>
-        <span className="font-semibold text-white">
+        <span className="font-semibold text-slate-900">
           {value.toFixed(1)}
           {suffix}
         </span>
@@ -50,7 +50,7 @@ export const SliderField = ({
         step={step}
         value={value}
         onChange={handleChange}
-        className="accent-brand h-2 rounded-full bg-white/10"
+        className="accent-brand h-2 rounded-full bg-slate-200"
       />
     </div>
   );
