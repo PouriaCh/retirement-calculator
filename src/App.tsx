@@ -324,7 +324,7 @@ function App() {
         <h3 className="mt-2 text-lg font-semibold text-white">
           How much can you save per{' '}
           {plan.frequency === 'biweekly'
-            ? 'paycheck'
+            ? 'bi-weekly paycheck'
             : plan.frequency === 'weekly'
               ? 'week'
               : 'month'}
@@ -334,7 +334,7 @@ function App() {
       <NumberField
         label={
           plan.frequency === 'biweekly'
-            ? 'Contribution per paycheck'
+            ? 'Contribution per bi-weekly paycheck'
             : plan.frequency === 'weekly'
               ? 'Weekly contribution'
               : 'Monthly contribution'
