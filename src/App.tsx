@@ -322,11 +322,23 @@ function App() {
       <div className="pt-4">
         <p className="text-sm uppercase tracking-wide text-slate-400">Step 4 of 4</p>
         <h3 className="mt-2 text-lg font-semibold text-white">
-          How much can you save per paycheck?
+          How much can you save per{' '}
+          {plan.frequency === 'biweekly'
+            ? 'paycheck'
+            : plan.frequency === 'weekly'
+              ? 'week'
+              : 'month'}
+          ?
         </h3>
       </div>
       <NumberField
-        label="Monthly contribution"
+        label={
+          plan.frequency === 'biweekly'
+            ? 'Contribution per paycheck'
+            : plan.frequency === 'weekly'
+              ? 'Weekly contribution'
+              : 'Monthly contribution'
+        }
         prefix="$"
         value={plan.contribution}
         min={0}
