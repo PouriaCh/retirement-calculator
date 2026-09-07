@@ -66,7 +66,6 @@ const sampleMilestones = <T,>(data: T[], target = 8) => {
 
 const STORAGE_KEY_PLAN = 'retirement-planner:plan';
 const STORAGE_KEY_TFSA = 'retirement-planner:tfsa';
-const STORAGE_KEY_MODE = 'retirement-planner:mode';
 
 function loadFromStorage<T>(key: string, fallback: T): T {
   try {
@@ -120,7 +119,9 @@ const PERIODS_PER_YEAR: Record<ContributionFrequency, number> = {
 };
 
 function App() {
-  const [mode, setMode] = useState<Mode>(() => loadFromStorage(STORAGE_KEY_MODE, 'quick') as Mode);
+  // Always start fresh visitors on Quick Start — the low-friction hook.
+  // Inputs persist across visits; the mode itself does not.
+  const [mode, setMode] = useState<Mode>('quick');
   const [plan, setPlan] = useState<PlanInput>(() => {
     const urlParam = getUrlParam();
     if (urlParam) {
@@ -149,10 +150,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_TFSA, JSON.stringify(tfsaPlan));
   }, [tfsaPlan]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_MODE, JSON.stringify(mode));
-  }, [mode]);
 
   // Keep URL in sync
   useEffect(() => {
@@ -614,13 +611,13 @@ function App() {
         <header className="text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-slate-400">
             <PiggyBank className="h-3.5 w-3.5 text-brand" />
-            Free retirement planner
+            Free · Private · No signup
           </div>
           <h1 className="mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Will you be ready?
+            Will you be ready to retire?
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-300">
-            Answer a few questions. Get a clear answer about your retirement.
+            4 questions. 30 seconds. Nothing you enter ever leaves your browser.
           </p>
         </header>
 
@@ -628,8 +625,8 @@ function App() {
         <div className="flex flex-wrap gap-3 justify-center">
           {[
             { id: 'quick' as Mode, label: 'Quick Start', icon: '⚡' },
-            { id: 'customize' as Mode, label: 'Customize', icon: '⚙️' },
-            { id: 'reverse' as Mode, label: 'Reverse', icon: '🎯' },
+            { id: 'reverse' as Mode, label: 'Set a Goal', icon: '🎯' },
+            { id: 'customize' as Mode, label: 'Full Control', icon: '⚙️' },
           ].map((m) => (
             <button
               key={m.id}
@@ -660,8 +657,8 @@ function App() {
                   {mode === 'quick'
                     ? 'Quick Start'
                     : mode === 'reverse'
-                      ? 'What do you need?'
-                      : 'Full Details'}
+                      ? 'Set a Goal'
+                      : 'Full Control'}
                 </p>
               </div>
             </div>
@@ -891,6 +888,19 @@ function App() {
             </div>
           </section>
         )}
+
+        {/* Trust footer */}
+        <footer className="text-center text-xs text-slate-500 pb-6">
+          <p>
+            No signup. No data ever leaves your browser. Free, always.{' '}
+            <button
+              onClick={() => setMode('customize')}
+              className="underline underline-offset-2 hover:text-slate-300 transition"
+            >
+              Includes RRSP &amp; TFSA support for Canadian accounts
+            </button>
+          </p>
+        </footer>
       </div>
     </main>
   );
