@@ -171,12 +171,18 @@ function App() {
   };
 
   // Calculate projections
-  const projection = useMemo(() => calculateProjection(plan), [plan]);
+  // In Quick Start and Reverse, keep contributions fixed (no salary growth)
+  // In Customize, contributions grow with salary
+  const projectionPlan = useMemo(
+    () => (mode === 'quick' || mode === 'reverse' ? { ...plan, salaryGrowth: 0 } : plan),
+    [plan, mode]
+  );
+  const projection = useMemo(() => calculateProjection(projectionPlan), [projectionPlan]);
   const summary = useMemo(() => summarizeProjection(projection), [projection]);
   const tfsaProjection = useMemo(
     () =>
       calculateProjection({
-        ...plan,
+        ...projectionPlan,
         currentBalance: tfsaPlan.currentBalance,
         contribution: tfsaPlan.contribution,
         frequency: tfsaPlan.frequency,
@@ -185,7 +191,7 @@ function App() {
         employerMatchPercent: 0,
         employerMatchCap: 0,
       }),
-    [plan, tfsaPlan]
+    [projectionPlan, tfsaPlan]
   );
   const tfsaSummary = useMemo(() => summarizeProjection(tfsaProjection), [tfsaProjection]);
 
