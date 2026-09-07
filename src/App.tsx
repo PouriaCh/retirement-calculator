@@ -734,7 +734,7 @@ function App() {
               </div>
             )}
 
-            {/* Reverse mode: Target + Required savings */}
+            {/* Reverse mode: Target + Required savings + Nest egg needed */}
             {mode === 'reverse' && (
               <div className="rounded-3xl border border-brand/30 bg-brand/10 p-6 shadow-xl shadow-black/30">
                 <p className="text-xs uppercase tracking-wide text-brand mb-2">Your savings goal</p>
@@ -745,6 +745,16 @@ function App() {
                       {currency.format(reverseTargetIncome)}
                     </p>
                     <p className="text-xs text-slate-400 mt-2">In today's dollars</p>
+                  </div>
+                  <div className="border-t border-brand/20 pt-4">
+                    <p className="text-sm text-slate-300">Nest egg needed (4% rule)</p>
+                    <p className="text-2xl font-semibold text-brand mt-1">
+                      {currency.format(reverseTargetIncome / 0.04)}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-2">
+                      {reverseTargetIncome.toLocaleString()} ÷ 0.04 ={' '}
+                      {(reverseTargetIncome / 0.04).toLocaleString()}
+                    </p>
                   </div>
                   <div className="border-t border-brand/20 pt-4">
                     <p className="text-sm text-slate-300">You need to save (per month)</p>
