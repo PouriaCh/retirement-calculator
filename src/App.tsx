@@ -9,6 +9,7 @@ import {
   TrendingDown,
   TrendingUp,
 } from 'lucide-react';
+import { InfoTooltip } from './components/InfoTooltip';
 import { NumberField } from './components/NumberField';
 import { SliderField } from './components/SliderField';
 import { StatCard } from './components/StatCard';
@@ -762,7 +763,15 @@ function App() {
                     <p className="text-xs text-slate-400 mt-2">In today's dollars</p>
                   </div>
                   <div className="border-t border-brand/20 pt-4">
-                    <p className="text-sm text-slate-300">Nest egg needed (4% rule)</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-slate-300">Nest egg needed (4% rule)</p>
+                      <InfoTooltip label="What is the 4% rule?">
+                        A widely-used rule of thumb: withdrawing 4% of your savings per year is
+                        generally considered sustainable over a 30-year retirement without running
+                        out of money. It's a guideline, not a guarantee — not specific to any
+                        country.
+                      </InfoTooltip>
+                    </div>
                     <p className="text-2xl font-semibold text-brand mt-1">
                       {currency.format(reverseTargetIncome / 0.04)}
                     </p>
@@ -818,11 +827,13 @@ function App() {
                     label="Total at retirement"
                     value={currency.format(combinedNestEgg)}
                     helper="In today's dollars"
+                    tooltip="What your savings and growth add up to by your retirement age, adjusted for inflation so it reflects today's purchasing power."
                   />
                   <StatCard
                     label="Annual retirement income"
                     value={currency.format(combinedInflationAdjustedWithdrawal)}
                     helper="4% withdrawal rule"
+                    tooltip="A widely-used rule of thumb: withdrawing 4% of your savings per year is generally considered sustainable over a 30-year retirement without running out of money. It's a guideline, not a guarantee — not specific to any country."
                   />
                 </div>
               </div>
