@@ -824,7 +824,7 @@ function App() {
 
             {/* Key stats (hidden in Reverse mode) */}
             {mode !== 'reverse' && (
-              <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-xl shadow-black/30">
+              <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-900 to-brand/10 p-6 shadow-xl shadow-black/30">
                 <div className="flex items-center justify-between">
                   <p className="text-xs uppercase tracking-wide text-slate-400">Your nest egg</p>
                   {mode === 'quick' && (
@@ -852,12 +852,14 @@ function App() {
                     value={currency.format(animatedNestEgg)}
                     helper="In today's dollars"
                     tooltip="What your savings and growth add up to by your retirement age, adjusted for inflation so it reflects today's purchasing power."
+                    accent="brand"
                   />
                   <StatCard
                     label="Annual retirement income"
                     value={currency.format(animatedRetirementIncome)}
                     helper="4% withdrawal rule"
                     tooltip="A widely-used rule of thumb: withdrawing 4% of your savings per year is generally considered sustainable over a 30-year retirement without running out of money. It's a guideline, not a guarantee — not specific to any country."
+                    accent="emerald"
                   />
                 </div>
               </div>
