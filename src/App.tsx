@@ -309,21 +309,7 @@ function App() {
       />
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 3 of 5</p>
-        <h3 className="mt-2 text-lg font-semibold text-white">What's your annual income?</h3>
-      </div>
-      <NumberField
-        label="Annual income"
-        prefix="$"
-        value={plan.annualIncome}
-        min={0}
-        step={1000}
-        onChange={(value) => updatePlan('annualIncome', value)}
-        helper="We'll check if you're on track to replace 70% of this"
-      />
-
-      <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 4 of 5</p>
+        <p className="text-sm uppercase tracking-wide text-slate-400">Step 3 of 4</p>
         <h3 className="mt-2 text-lg font-semibold text-white">How much have you saved so far?</h3>
       </div>
       <NumberField
@@ -336,8 +322,10 @@ function App() {
       />
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 5 of 5</p>
-        <h3 className="mt-2 text-lg font-semibold text-white">How much can you save per month?</h3>
+        <p className="text-sm uppercase tracking-wide text-slate-400">Step 4 of 4</p>
+        <h3 className="mt-2 text-lg font-semibold text-white">
+          How much can you save per paycheck?
+        </h3>
       </div>
       <NumberField
         label="Monthly contribution"
