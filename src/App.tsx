@@ -10,6 +10,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { InfoTooltip } from './components/InfoTooltip';
+import { useCountUp } from './hooks/useCountUp';
 import { NumberField } from './components/NumberField';
 import { SliderField } from './components/SliderField';
 import { StatCard } from './components/StatCard';
@@ -249,6 +250,13 @@ function App() {
     }
     return (low + high) / 2;
   }, [plan, reverseTargetIncome]);
+
+  // Animated versions of the headline numbers — gives each result a "reveal"
+  // moment instead of snapping instantly when inputs change.
+  const animatedNestEgg = useCountUp(combinedNestEgg);
+  const animatedRetirementIncome = useCountUp(combinedInflationAdjustedWithdrawal);
+  const animatedNestEggNeeded = useCountUp(reverseTargetIncome / 0.04);
+  const animatedRequiredSavings = useCountUp(requiredMonthlyForTarget);
 
   const updatePlan = <K extends keyof PlanInput>(key: K, value: PlanInput[K]) => {
     setPlan((prev) => {
@@ -732,7 +740,7 @@ function App() {
                           <>
                             Your plan generates{' '}
                             <span className="font-semibold text-white">
-                              {currency.format(combinedInflationAdjustedWithdrawal)}
+                              {currency.format(animatedRetirementIncome)}
                             </span>{' '}
                             / year. Target:{' '}
                             <span className="font-semibold text-white">
@@ -789,7 +797,7 @@ function App() {
                       </InfoTooltip>
                     </div>
                     <p className="text-2xl font-semibold text-brand mt-1">
-                      {currency.format(reverseTargetIncome / 0.04)}
+                      {currency.format(animatedNestEggNeeded)}
                     </p>
                     <p className="text-xs text-slate-400 mt-2">
                       {(reverseTargetIncome / 0.04).toLocaleString()} × 4% ={' '}
@@ -807,7 +815,7 @@ function App() {
                       )
                     </p>
                     <p className="text-3xl font-semibold text-brand mt-1">
-                      {currency.format(requiredMonthlyForTarget)}
+                      {currency.format(animatedRequiredSavings)}
                     </p>
                   </div>
                 </div>
@@ -841,13 +849,13 @@ function App() {
                 <div className="mt-3 space-y-3">
                   <StatCard
                     label="Total at retirement"
-                    value={currency.format(combinedNestEgg)}
+                    value={currency.format(animatedNestEgg)}
                     helper="In today's dollars"
                     tooltip="What your savings and growth add up to by your retirement age, adjusted for inflation so it reflects today's purchasing power."
                   />
                   <StatCard
                     label="Annual retirement income"
-                    value={currency.format(combinedInflationAdjustedWithdrawal)}
+                    value={currency.format(animatedRetirementIncome)}
                     helper="4% withdrawal rule"
                     tooltip="A widely-used rule of thumb: withdrawing 4% of your savings per year is generally considered sustainable over a 30-year retirement without running out of money. It's a guideline, not a guarantee — not specific to any country."
                   />
