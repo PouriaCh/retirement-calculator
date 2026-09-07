@@ -391,12 +391,27 @@ function App() {
           Factored into calculation
         </p>
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-slate-300">Expected return</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-300">Expected return</span>
+              <InfoTooltip label="What is expected return?">
+                The assumed annual growth rate of your investments. This is what turns your
+                contributions into a bigger nest egg over time — a higher rate means faster growth,
+                but also more risk.
+              </InfoTooltip>
+            </div>
             <span className="font-semibold text-white">{plan.annualReturn}%</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-slate-300">Inflation</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-300">Inflation</span>
+              <InfoTooltip label="What is inflation used for?">
+                Prices rise over time, so money loses buying power. This is how much we assume
+                prices rise per year — it's what makes your ${reverseTargetIncome.toLocaleString()}{' '}
+                target mean the same thing it means today, not a smaller amount by the time you
+                retire.
+              </InfoTooltip>
+            </div>
             <span className="font-semibold text-white">{plan.inflation}%</span>
           </div>
           <div className="flex justify-between">
