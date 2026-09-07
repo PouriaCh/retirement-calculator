@@ -811,8 +811,8 @@ function App() {
               </div>
             )}
 
-            {/* Assumptions (hidden in Reverse mode) */}
-            {mode !== 'reverse' && (
+            {/* Assumptions (only shown in Customize mode) */}
+            {mode === 'customize' && (
               <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-6">
                 <p className="text-xs uppercase tracking-wide text-slate-400 mb-4">
                   How we got here
@@ -830,14 +830,6 @@ function App() {
                     <span className="text-slate-300">Salary growth</span>
                     <span className="font-semibold text-white">{plan.salaryGrowth}%</span>
                   </div>
-                  {mode === 'quick' && (
-                    <button
-                      onClick={() => setMode('customize')}
-                      className="mt-4 w-full text-xs font-medium text-brand hover:text-brand/80 transition"
-                    >
-                      Change assumptions →
-                    </button>
-                  )}
                 </div>
               </div>
             )}
