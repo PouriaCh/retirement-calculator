@@ -196,9 +196,14 @@ function App() {
   const annualContribution = plan.contribution * PERIODS_PER_YEAR[plan.frequency];
   const safeWithdrawal = summary.finalBalance * 0.04;
   const tfsaSafeWithdrawal = tfsaSummary.finalBalance * 0.04;
-  const combinedSafeWithdrawal = safeWithdrawal + tfsaSafeWithdrawal;
-  const combinedNestEgg = summary.finalBalance + tfsaSummary.finalBalance;
-  const combinedInflationAdjusted = summary.inflationAdjusted + tfsaSummary.inflationAdjusted;
+  // Only Full Control ever shows or collects TFSA inputs — Quick Start and
+  // Set a Goal must not silently fold in a TFSA balance/contribution the
+  // user never entered or saw.
+  const includeTfsa = mode === 'customize';
+  const combinedSafeWithdrawal = safeWithdrawal + (includeTfsa ? tfsaSafeWithdrawal : 0);
+  const combinedNestEgg = summary.finalBalance + (includeTfsa ? tfsaSummary.finalBalance : 0);
+  const combinedInflationAdjusted =
+    summary.inflationAdjusted + (includeTfsa ? tfsaSummary.inflationAdjusted : 0);
 
   // Verdict logic
   const combinedInflationAdjustedWithdrawal = combinedInflationAdjusted * 0.04;
@@ -219,42 +224,31 @@ function App() {
     ? combinedInflationAdjustedWithdrawal - targetRetirementIncome
     : null;
 
-  // Reverse calculator: how much to save to hit target income
+  // Reverse calculator: how much to save to hit target income.
+  // Set a Goal never shows or collects TFSA inputs, so the search is scoped
+  // to the single savings account it does show — no hidden TFSA assumptions.
+  // Contributions are held fixed (salaryGrowth: 0) to match the "save this
+  // much every paycheck" promise. The target is stated in today's dollars,
+  // so the check compares against the inflation-adjusted balance, not the
+  // nominal one — otherwise the required amount would be understated.
   const requiredMonthlyForTarget = useMemo(() => {
     if (reverseTargetIncome <= 0) return 0;
-    // Binary search to find the contribution that achieves target
     let low = 0;
     let high = 50000;
     for (let i = 0; i < 50; i++) {
       const mid = (low + high) / 2;
-      const testPlan = { ...plan, contribution: mid };
-      const testProj = calculateProjection(testPlan);
-      const testSummary = summarizeProjection(testProj);
+      const testPlan = { ...plan, contribution: mid, salaryGrowth: 0 };
+      const testSummary = summarizeProjection(calculateProjection(testPlan));
+      const realWithdrawal = testSummary.inflationAdjusted * 0.04;
 
-      // Also calculate TFSA to get combined withdrawal
-      const testTfsaProj = calculateProjection({
-        ...testPlan,
-        currentBalance: tfsaPlan.currentBalance,
-        contribution: tfsaPlan.contribution,
-        frequency: tfsaPlan.frequency,
-        annualReturn: tfsaPlan.annualReturn,
-        salaryGrowth: 0,
-        employerMatchPercent: 0,
-        employerMatchCap: 0,
-      });
-      const testTfsaSummary = summarizeProjection(testTfsaProj);
-
-      // Combined withdrawal: RRSP + TFSA
-      const combinedWithdrawal = (testSummary.finalBalance + testTfsaSummary.finalBalance) * 0.04;
-
-      if (combinedWithdrawal < reverseTargetIncome) {
+      if (realWithdrawal < reverseTargetIncome) {
         low = mid;
       } else {
         high = mid;
       }
     }
     return (low + high) / 2;
-  }, [plan, tfsaPlan, reverseTargetIncome]);
+  }, [plan, reverseTargetIncome]);
 
   const updatePlan = <K extends keyof PlanInput>(key: K, value: PlanInput[K]) => {
     setPlan((prev) => {
