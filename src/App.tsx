@@ -295,9 +295,8 @@ function App() {
         label="Retirement age"
         value={plan.retirementAge}
         min={plan.currentAge + 1}
-        max={71}
+        max={90}
         onChange={(value) => updatePlan('retirementAge', value)}
-        helper="RRSP must convert to RRIF by age 71"
       />
 
       <div className="pt-4">
@@ -368,7 +367,7 @@ function App() {
           label="Retirement age"
           value={plan.retirementAge}
           min={plan.currentAge + 1}
-          max={71}
+          max={90}
           onChange={(value) => updatePlan('retirementAge', value)}
         />
       </div>
@@ -473,7 +472,7 @@ function App() {
           min={0}
           step={1000}
           onChange={(value) => updatePlan('annualIncome', value)}
-          helper="Used for RRSP room calculation"
+          helper="Used for RRSP room and your on-track score below"
         />
       </div>
 
@@ -513,6 +512,7 @@ function App() {
             max={20}
             step={0.1}
             onChange={(value) => updatePlan('annualReturn', value)}
+            tooltip="The assumed annual growth rate of your investments. Higher means faster growth, but also more risk — a diversified portfolio has historically averaged around 6-10%."
           />
           <SliderField
             label="Inflation rate"
@@ -521,6 +521,7 @@ function App() {
             max={4}
             step={0.1}
             onChange={(value) => updatePlan('inflation', value)}
+            tooltip="Prices rise over time, so money loses buying power. This converts your future nominal balance into today's purchasing power, shown as 'Today's dollars' throughout the results."
           />
           <SliderField
             label="Salary growth"
@@ -529,6 +530,7 @@ function App() {
             max={6}
             step={0.1}
             onChange={(value) => updatePlan('salaryGrowth', value)}
+            tooltip="If you expect raises over your career, your contribution amount grows by this % each year too, instead of staying fixed at today's dollar amount."
           />
         </div>
       </div>
@@ -611,6 +613,7 @@ function App() {
               max={20}
               step={0.1}
               onChange={(value) => updateTfsaPlan('annualReturn', value)}
+              tooltip="The assumed annual growth rate for your TFSA specifically — often set lower than your main account if you hold more conservative investments here."
             />
           </div>
         </>
