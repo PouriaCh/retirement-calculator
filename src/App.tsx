@@ -673,8 +673,8 @@ function App() {
 
           {/* Results */}
           <section className="flex flex-col gap-6">
-            {/* Verdict (hidden in Reverse mode) */}
-            {mode !== 'reverse' && (
+            {/* Verdict (only shown in Customize mode, where income is collected) */}
+            {mode === 'customize' && (
               <div
                 className={`rounded-3xl border p-6 shadow-xl shadow-black/30 ${
                   verdictStatus === 'green'
@@ -795,7 +795,27 @@ function App() {
             {/* Key stats (hidden in Reverse mode) */}
             {mode !== 'reverse' && (
               <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-xl shadow-black/30">
-                <p className="text-xs uppercase tracking-wide text-slate-400">Your nest egg</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs uppercase tracking-wide text-slate-400">Your nest egg</p>
+                  {mode === 'quick' && (
+                    <button
+                      onClick={handleCopyLink}
+                      className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 transition"
+                    >
+                      {copied ? (
+                        <>
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Link className="h-3.5 w-3.5" />
+                          Share
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
                 <div className="mt-3 space-y-3">
                   <StatCard
                     label="Total at retirement"
