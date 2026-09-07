@@ -226,15 +226,31 @@ function App() {
       const testPlan = { ...plan, contribution: mid };
       const testProj = calculateProjection(testPlan);
       const testSummary = summarizeProjection(testProj);
-      const testWithdrawal = testSummary.finalBalance * 0.04;
-      if (testWithdrawal < reverseTargetIncome) {
+
+      // Also calculate TFSA to get combined withdrawal
+      const testTfsaProj = calculateProjection({
+        ...testPlan,
+        currentBalance: tfsaPlan.currentBalance,
+        contribution: tfsaPlan.contribution,
+        frequency: tfsaPlan.frequency,
+        annualReturn: tfsaPlan.annualReturn,
+        salaryGrowth: 0,
+        employerMatchPercent: 0,
+        employerMatchCap: 0,
+      });
+      const testTfsaSummary = summarizeProjection(testTfsaProj);
+
+      // Combined withdrawal: RRSP + TFSA
+      const combinedWithdrawal = (testSummary.finalBalance + testTfsaSummary.finalBalance) * 0.04;
+
+      if (combinedWithdrawal < reverseTargetIncome) {
         low = mid;
       } else {
         high = mid;
       }
     }
     return (low + high) / 2;
-  }, [plan, reverseTargetIncome]);
+  }, [plan, tfsaPlan, reverseTargetIncome]);
 
   const updatePlan = <K extends keyof PlanInput>(key: K, value: PlanInput[K]) => {
     setPlan((prev) => {
