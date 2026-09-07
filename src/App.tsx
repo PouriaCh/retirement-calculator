@@ -379,6 +379,34 @@ function App() {
         step={1000}
         onChange={(value) => updatePlan('currentBalance', value)}
       />
+
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <p className="text-xs uppercase tracking-wide text-slate-400 mb-3">
+          Factored into calculation
+        </p>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-slate-300">Expected return</span>
+            <span className="font-semibold text-white">{plan.annualReturn}%</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-300">Inflation</span>
+            <span className="font-semibold text-white">{plan.inflation}%</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-300">Contribution frequency</span>
+            <span className="font-semibold text-white capitalize">
+              {plan.frequency === 'biweekly' ? 'Bi-weekly' : plan.frequency}
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={() => setMode('customize')}
+          className="mt-4 w-full text-xs font-medium text-brand hover:text-brand/80 transition"
+        >
+          Adjust assumptions →
+        </button>
+      </div>
     </div>
   );
 
