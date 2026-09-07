@@ -321,15 +321,7 @@ function App() {
 
       <div className="pt-4">
         <p className="text-sm uppercase tracking-wide text-slate-400">Step 4 of 4</p>
-        <h3 className="mt-2 text-lg font-semibold text-white">
-          How much can you save per{' '}
-          {plan.frequency === 'biweekly'
-            ? 'bi-weekly paycheck'
-            : plan.frequency === 'weekly'
-              ? 'week'
-              : 'month'}
-          ?
-        </h3>
+        <h3 className="mt-2 text-lg font-semibold text-white">How much can you save?</h3>
       </div>
       <NumberField
         label={
