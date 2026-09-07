@@ -655,94 +655,109 @@ function App() {
 
           {/* Results */}
           <section className="flex flex-col gap-6">
-            {/* Verdict */}
-            <div
-              className={`rounded-3xl border p-6 shadow-xl shadow-black/30 ${
-                verdictStatus === 'green'
-                  ? 'border-emerald-500/30 bg-emerald-950/60'
-                  : verdictStatus === 'amber'
-                    ? 'border-amber-500/30 bg-amber-950/60'
-                    : 'border-rose-500/30 bg-rose-950/60'
-              }`}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  {verdictStatus === 'green' && (
-                    <CheckCircle2 className="h-8 w-8 text-emerald-400 flex-shrink-0" />
-                  )}
-                  {verdictStatus === 'amber' && (
-                    <TrendingUp className="h-8 w-8 text-amber-400 flex-shrink-0" />
-                  )}
-                  {verdictStatus === 'red' && (
-                    <TrendingDown className="h-8 w-8 text-rose-400 flex-shrink-0" />
-                  )}
-                  <div>
-                    <p
-                      className={`text-lg font-semibold ${
-                        verdictStatus === 'green'
-                          ? 'text-emerald-300'
+            {/* Verdict (hidden in Reverse mode) */}
+            {mode !== 'reverse' && (
+              <div
+                className={`rounded-3xl border p-6 shadow-xl shadow-black/30 ${
+                  verdictStatus === 'green'
+                    ? 'border-emerald-500/30 bg-emerald-950/60'
+                    : verdictStatus === 'amber'
+                      ? 'border-amber-500/30 bg-amber-950/60'
+                      : 'border-rose-500/30 bg-rose-950/60'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    {verdictStatus === 'green' && (
+                      <CheckCircle2 className="h-8 w-8 text-emerald-400 flex-shrink-0" />
+                    )}
+                    {verdictStatus === 'amber' && (
+                      <TrendingUp className="h-8 w-8 text-amber-400 flex-shrink-0" />
+                    )}
+                    {verdictStatus === 'red' && (
+                      <TrendingDown className="h-8 w-8 text-rose-400 flex-shrink-0" />
+                    )}
+                    <div>
+                      <p
+                        className={`text-lg font-semibold ${
+                          verdictStatus === 'green'
+                            ? 'text-emerald-300'
+                            : verdictStatus === 'amber'
+                              ? 'text-amber-300'
+                              : 'text-rose-300'
+                        }`}
+                      >
+                        {verdictStatus === 'green'
+                          ? "You're on track 🎉"
                           : verdictStatus === 'amber'
-                            ? 'text-amber-300'
-                            : 'text-rose-300'
-                      }`}
-                    >
-                      {verdictStatus === 'green'
-                        ? "You're on track 🎉"
-                        : verdictStatus === 'amber'
-                          ? hasIncomeForVerdict
-                            ? 'Getting there — almost!'
-                            : 'Verdict pending'
-                          : "You're behind — close the gap"}
+                            ? hasIncomeForVerdict
+                              ? 'Getting there — almost!'
+                              : 'Verdict pending'
+                            : "You're behind — close the gap"}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-300">
+                        {hasIncomeForVerdict ? (
+                          <>
+                            Your plan generates{' '}
+                            <span className="font-semibold text-white">
+                              {currency.format(combinedInflationAdjustedWithdrawal)}
+                            </span>{' '}
+                            / year. Target:{' '}
+                            <span className="font-semibold text-white">
+                              {currency.format(targetRetirementIncome)}
+                            </span>{' '}
+                            (70% of income)
+                          </>
+                        ) : (
+                          'Enter your income above to see your retirement score'
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCopyLink}
+                    className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 transition"
+                  >
+                    {copied ? (
+                      <>
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Link className="h-3.5 w-3.5" />
+                        Share
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Reverse mode: Target + Required savings */}
+            {mode === 'reverse' && (
+              <div className="rounded-3xl border border-brand/30 bg-brand/10 p-6 shadow-xl shadow-black/30">
+                <p className="text-xs uppercase tracking-wide text-brand mb-2">Your savings goal</p>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-slate-300">Target annual income at retirement</p>
+                    <p className="text-3xl font-semibold text-white mt-1">
+                      {currency.format(reverseTargetIncome)}
                     </p>
-                    <p className="mt-1 text-sm text-slate-300">
-                      {mode === 'reverse' ? (
-                        <>
-                          You need to save{' '}
-                          <span className="font-semibold text-white">
-                            {currency.format(requiredMonthlyForTarget)}
-                          </span>{' '}
-                          per month to hit your goal of{' '}
-                          <span className="font-semibold text-white">
-                            {currency.format(reverseTargetIncome)}
-                          </span>{' '}
-                          per year
-                        </>
-                      ) : hasIncomeForVerdict ? (
-                        <>
-                          Your plan generates{' '}
-                          <span className="font-semibold text-white">
-                            {currency.format(combinedInflationAdjustedWithdrawal)}
-                          </span>{' '}
-                          / year. Target:{' '}
-                          <span className="font-semibold text-white">
-                            {currency.format(targetRetirementIncome)}
-                          </span>{' '}
-                          (70% of income)
-                        </>
-                      ) : (
-                        'Enter your income above to see your retirement score'
-                      )}
+                    <p className="text-xs text-slate-400 mt-2">In today's dollars</p>
+                  </div>
+                  <div className="border-t border-brand/20 pt-4">
+                    <p className="text-sm text-slate-300">You need to save (per month)</p>
+                    <p className="text-3xl font-semibold text-brand mt-1">
+                      {currency.format(requiredMonthlyForTarget)}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-2">
+                      Frequency: {plan.frequency === 'biweekly' ? 'Bi-weekly' : plan.frequency}
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={handleCopyLink}
-                  className="flex flex-shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/10 transition"
-                >
-                  {copied ? (
-                    <>
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Link className="h-3.5 w-3.5" />
-                      Share
-                    </>
-                  )}
-                </button>
               </div>
-            </div>
+            )}
 
             {/* Key stats */}
             <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-xl shadow-black/30">
