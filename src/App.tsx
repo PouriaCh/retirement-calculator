@@ -768,8 +768,8 @@ function App() {
                       {currency.format(reverseTargetIncome / 0.04)}
                     </p>
                     <p className="text-xs text-slate-400 mt-2">
-                      {reverseTargetIncome.toLocaleString()} ÷ 0.04 ={' '}
-                      {(reverseTargetIncome / 0.04).toLocaleString()}
+                      {(reverseTargetIncome / 0.04).toLocaleString()} × 4% ={' '}
+                      {reverseTargetIncome.toLocaleString()}
                     </p>
                   </div>
                   <div className="border-t border-brand/20 pt-4">
