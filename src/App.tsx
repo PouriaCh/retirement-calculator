@@ -428,6 +428,14 @@ function App() {
 
   const renderCustomize = () => (
     <div className="space-y-6">
+      {/* Back to Reverse button (if user came from Reverse) */}
+      <button
+        onClick={() => setMode('reverse')}
+        className="flex items-center gap-2 text-sm font-medium text-brand hover:text-brand/80 transition"
+      >
+        ← Back to target calculation
+      </button>
+
       {/* Core fields */}
       <div className="grid gap-6 sm:grid-cols-2">
         <NumberField
