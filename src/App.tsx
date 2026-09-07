@@ -25,7 +25,7 @@ const defaultPlan: PlanInput = {
   currentAge: 32,
   retirementAge: 65,
   currentBalance: 40000,
-  contribution: 850,
+  contribution: 400,
   annualIncome: 90000,
   rrspCarryForward: 0,
   employerMatchPercent: 0,
@@ -33,7 +33,7 @@ const defaultPlan: PlanInput = {
   annualReturn: 6.5,
   inflation: 2.1,
   salaryGrowth: 2.5,
-  frequency: 'monthly',
+  frequency: 'biweekly',
 };
 
 const defaultTfsaPlan = {
