@@ -285,7 +285,7 @@ function App() {
     <div className="space-y-6">
       <div>
         <p className="text-sm uppercase tracking-wide text-slate-400">Step 1 of 5</p>
-        <h3 className="mt-2 text-lg font-semibold text-white">How old are you?</h3>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-white">How old are you?</h3>
       </div>
       <NumberField
         label="Current age"
@@ -297,7 +297,9 @@ function App() {
 
       <div className="pt-4">
         <p className="text-sm uppercase tracking-wide text-slate-400">Step 2 of 5</p>
-        <h3 className="mt-2 text-lg font-semibold text-white">When do you want to retire?</h3>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-white">
+          When do you want to retire?
+        </h3>
       </div>
       <NumberField
         label="Retirement age"
@@ -309,7 +311,9 @@ function App() {
 
       <div className="pt-4">
         <p className="text-sm uppercase tracking-wide text-slate-400">Step 3 of 4</p>
-        <h3 className="mt-2 text-lg font-semibold text-white">How much have you saved so far?</h3>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-white">
+          How much have you saved so far?
+        </h3>
       </div>
       <NumberField
         label="Current savings"
@@ -322,7 +326,9 @@ function App() {
 
       <div className="pt-4">
         <p className="text-sm uppercase tracking-wide text-slate-400">Step 4 of 4</p>
-        <h3 className="mt-2 text-lg font-semibold text-white">How much can you save?</h3>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-white">
+          How much can you save?
+        </h3>
       </div>
       <NumberField
         label={
@@ -347,7 +353,7 @@ function App() {
         <p className="text-sm uppercase tracking-wide text-slate-400">
           Your target retirement income
         </p>
-        <h3 className="mt-2 text-lg font-semibold text-white">How much per year?</h3>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-white">How much per year?</h3>
       </div>
       <NumberField
         label="Target annual retirement income"
@@ -361,7 +367,7 @@ function App() {
 
       <div className="pt-4">
         <p className="text-sm uppercase tracking-wide text-slate-400">Your timeline</p>
-        <h3 className="mt-2 text-lg font-semibold text-white">When do you retire?</h3>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-white">When do you retire?</h3>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <NumberField
@@ -382,7 +388,9 @@ function App() {
 
       <div className="pt-4">
         <p className="text-sm uppercase tracking-wide text-slate-400">Your starting point</p>
-        <h3 className="mt-2 text-lg font-semibold text-white">What do you have now?</h3>
+        <h3 className="font-heading mt-2 text-lg font-semibold text-white">
+          What do you have now?
+        </h3>
       </div>
       <NumberField
         label="Current savings"
@@ -647,7 +655,7 @@ function App() {
             <PiggyBank className="h-3.5 w-3.5 text-brand" />
             Free · Private · No signup
           </div>
-          <h1 className="mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+          <h1 className="font-heading mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl">
             Will you be ready to{' '}
             <span className="bg-gradient-to-r from-sky-300 to-emerald-300 bg-clip-text text-transparent">
               retire?
@@ -731,7 +739,7 @@ function App() {
                     )}
                     <div>
                       <p
-                        className={`text-lg font-semibold ${
+                        className={`font-heading text-lg font-semibold ${
                           verdictStatus === 'green'
                             ? 'text-emerald-300'
                             : verdictStatus === 'amber'
@@ -793,7 +801,7 @@ function App() {
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-slate-300">Target annual income at retirement</p>
-                    <p className="text-3xl font-semibold text-white mt-1">
+                    <p className="font-heading mt-1 text-3xl font-semibold text-white">
                       {currency.format(reverseTargetIncome)}
                     </p>
                     <p className="text-xs text-slate-400 mt-2">In today's dollars</p>
@@ -808,7 +816,7 @@ function App() {
                         country.
                       </InfoTooltip>
                     </div>
-                    <p className="text-2xl font-semibold text-brand mt-1">
+                    <p className="font-heading mt-1 text-2xl font-semibold text-brand">
                       {currency.format(animatedNestEggNeeded)}
                     </p>
                     <p className="text-xs text-slate-400 mt-2">
@@ -826,7 +834,7 @@ function App() {
                           : 'month'}
                       )
                     </p>
-                    <p className="text-3xl font-semibold text-brand mt-1">
+                    <p className="font-heading mt-1 text-3xl font-semibold text-brand">
                       {currency.format(animatedRequiredSavings)}
                     </p>
                   </div>
@@ -915,7 +923,7 @@ function App() {
         {/* Charts section (only in customize mode) */}
         {mode === 'customize' && (
           <section className="rounded-3xl border border-white/5 bg-slate-900/70 p-6 shadow-2xl shadow-black/30">
-            <h2 className="text-xl font-semibold text-white">Your growth journey</h2>
+            <h2 className="font-heading text-xl font-semibold text-white">Your growth journey</h2>
             <p className="text-sm text-slate-400 mt-1">
               {plan.retirementAge - plan.currentAge} years · balances update instantly
             </p>

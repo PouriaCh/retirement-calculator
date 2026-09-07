@@ -30,7 +30,7 @@ export const StatCard = ({ label, value, helper, tooltip, accent = 'neutral' }: 
         </InfoTooltip>
       ) : null}
     </div>
-    <p className={`mt-2 text-2xl font-semibold ${VALUE_STYLES[accent]}`}>{value}</p>
+    <p className={`font-heading mt-2 text-2xl font-semibold ${VALUE_STYLES[accent]}`}>{value}</p>
     {helper ? <p className="mt-1 text-xs text-slate-400">{helper}</p> : null}
   </div>
 );
