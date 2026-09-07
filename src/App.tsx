@@ -262,7 +262,7 @@ function App() {
   const renderQuickStart = () => (
     <div className="space-y-6">
       <div>
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 1 of 4</p>
+        <p className="text-sm uppercase tracking-wide text-slate-400">Step 1 of 5</p>
         <h3 className="mt-2 text-lg font-semibold text-white">How old are you?</h3>
       </div>
       <NumberField
@@ -274,7 +274,7 @@ function App() {
       />
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 2 of 4</p>
+        <p className="text-sm uppercase tracking-wide text-slate-400">Step 2 of 5</p>
         <h3 className="mt-2 text-lg font-semibold text-white">When do you want to retire?</h3>
       </div>
       <NumberField
@@ -287,7 +287,21 @@ function App() {
       />
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 3 of 4</p>
+        <p className="text-sm uppercase tracking-wide text-slate-400">Step 3 of 5</p>
+        <h3 className="mt-2 text-lg font-semibold text-white">What's your annual income?</h3>
+      </div>
+      <NumberField
+        label="Annual income"
+        prefix="$"
+        value={plan.annualIncome}
+        min={0}
+        step={1000}
+        onChange={(value) => updatePlan('annualIncome', value)}
+        helper="We'll check if you're on track to replace 70% of this"
+      />
+
+      <div className="pt-4">
+        <p className="text-sm uppercase tracking-wide text-slate-400">Step 4 of 5</p>
         <h3 className="mt-2 text-lg font-semibold text-white">How much have you saved so far?</h3>
       </div>
       <NumberField
@@ -300,7 +314,7 @@ function App() {
       />
 
       <div className="pt-4">
-        <p className="text-sm uppercase tracking-wide text-slate-400">Step 4 of 4</p>
+        <p className="text-sm uppercase tracking-wide text-slate-400">Step 5 of 5</p>
         <h3 className="mt-2 text-lg font-semibold text-white">How much can you save per month?</h3>
       </div>
       <NumberField
@@ -648,9 +662,9 @@ function App() {
                         ? "You're on track 🎉"
                         : verdictStatus === 'amber'
                           ? hasIncomeForVerdict
-                            ? 'Getting there'
-                            : 'Add your income'
-                          : "You're behind"}
+                            ? 'Getting there — almost!'
+                            : 'Verdict pending'
+                          : "You're behind — close the gap"}
                     </p>
                     <p className="mt-1 text-sm text-slate-300">
                       {mode === 'reverse' ? (
@@ -671,10 +685,14 @@ function App() {
                           <span className="font-semibold text-white">
                             {currency.format(combinedInflationAdjustedWithdrawal)}
                           </span>{' '}
-                          / year
+                          / year. Target:{' '}
+                          <span className="font-semibold text-white">
+                            {currency.format(targetRetirementIncome)}
+                          </span>{' '}
+                          (70% of income)
                         </>
                       ) : (
-                        'Add your income to see your score'
+                        'Enter your income above to see your retirement score'
                       )}
                     </p>
                   </div>
