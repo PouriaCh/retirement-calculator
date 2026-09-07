@@ -759,22 +759,24 @@ function App() {
               </div>
             )}
 
-            {/* Key stats */}
-            <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-xl shadow-black/30">
-              <p className="text-xs uppercase tracking-wide text-slate-400">Your nest egg</p>
-              <div className="mt-3 space-y-3">
-                <StatCard
-                  label="Total at retirement"
-                  value={currency.format(combinedNestEgg)}
-                  helper="In today's dollars"
-                />
-                <StatCard
-                  label="Annual retirement income"
-                  value={currency.format(combinedInflationAdjustedWithdrawal)}
-                  helper="4% withdrawal rule"
-                />
+            {/* Key stats (hidden in Reverse mode) */}
+            {mode !== 'reverse' && (
+              <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-6 shadow-xl shadow-black/30">
+                <p className="text-xs uppercase tracking-wide text-slate-400">Your nest egg</p>
+                <div className="mt-3 space-y-3">
+                  <StatCard
+                    label="Total at retirement"
+                    value={currency.format(combinedNestEgg)}
+                    helper="In today's dollars"
+                  />
+                  <StatCard
+                    label="Annual retirement income"
+                    value={currency.format(combinedInflationAdjustedWithdrawal)}
+                    helper="4% withdrawal rule"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Assumptions */}
             <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-6">
