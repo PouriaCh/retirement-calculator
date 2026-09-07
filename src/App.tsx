@@ -630,16 +630,28 @@ function App() {
   );
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 py-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4">
+    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 py-10">
+      {/* Decorative glow — adds depth/warmth behind the hero without any image assets */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-32 left-1/2 h-[32rem] w-[32rem] -translate-x-[60%] rounded-full bg-brand/20 blur-[120px]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-16 right-1/2 h-[26rem] w-[26rem] translate-x-[70%] rounded-full bg-emerald-500/10 blur-[120px]"
+      />
+      <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-4">
         {/* Header */}
         <header className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-slate-400">
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-sky-200">
             <PiggyBank className="h-3.5 w-3.5 text-brand" />
             Free · Private · No signup
           </div>
           <h1 className="mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Will you be ready to retire?
+            Will you be ready to{' '}
+            <span className="bg-gradient-to-r from-sky-300 to-emerald-300 bg-clip-text text-transparent">
+              retire?
+            </span>
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-300">
             4 questions. 30 seconds. Nothing you enter ever leaves your browser.
