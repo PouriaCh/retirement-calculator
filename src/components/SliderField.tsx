@@ -10,7 +10,15 @@ interface SliderFieldProps {
   suffix?: string;
 }
 
-export const SliderField = ({ label, value, onChange, min, max, step = 0.1, suffix = '%' }: SliderFieldProps) => {
+export const SliderField = ({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step = 0.1,
+  suffix = '%',
+}: SliderFieldProps) => {
   const id = useId();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -24,7 +32,8 @@ export const SliderField = ({ label, value, onChange, min, max, step = 0.1, suff
       <div className="flex items-center justify-between text-sm text-slate-300">
         <span className="font-medium">{label}</span>
         <span className="font-semibold text-white">
-          {value.toFixed(1)}{suffix}
+          {value.toFixed(1)}
+          {suffix}
         </span>
       </div>
       <input

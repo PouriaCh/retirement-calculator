@@ -54,7 +54,9 @@ export const BalanceMiniChart = ({ data, label, color }: BalanceMiniChartProps) 
           label(context: TooltipItem<'line'>) {
             const parsed = context.parsed;
             const value =
-              typeof parsed === 'object' && parsed !== null ? Number((parsed as { y?: number }).y ?? 0) : Number(parsed ?? 0);
+              typeof parsed === 'object' && parsed !== null
+                ? Number((parsed as { y?: number }).y ?? 0)
+                : Number(parsed ?? 0);
             return `${label}: ${currencyFormatter.format(value)}`;
           },
         },

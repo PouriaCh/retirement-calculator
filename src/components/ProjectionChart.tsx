@@ -26,7 +26,11 @@ const currencyFormatter = new Intl.NumberFormat('en-CA', {
 
 export const ProjectionChart = ({ data }: ProjectionChartProps) => {
   if (!data.length) {
-    return <p className="text-sm text-slate-400">Add a contribution plan to preview your retirement balance.</p>;
+    return (
+      <p className="text-sm text-slate-400">
+        Add a contribution plan to preview your retirement balance.
+      </p>
+    );
   }
 
   const labels = data.map((point) => `Age ${point.age}`);
