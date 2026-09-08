@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        heading: ['"Sora"', 'system-ui', 'sans-serif'],
+        heading: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
         body: ['"Inter"', 'system-ui', 'sans-serif'],
       },
       colors: {

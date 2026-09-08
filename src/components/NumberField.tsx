@@ -86,11 +86,11 @@ export const NumberField = ({
           : null;
 
   return (
-    <label htmlFor={id} className="flex flex-col gap-2 text-sm font-medium text-slate-200">
+    <label htmlFor={id} className="flex flex-col gap-2 text-sm font-medium text-slate-700">
       <span>{label}</span>
       <div className="relative">
         {prefix ? (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
             {prefix}
           </span>
         ) : null}
@@ -107,23 +107,23 @@ export const NumberField = ({
           onBlur={handleBlur}
           aria-invalid={isOutOfRange}
           className={[
-            'w-full rounded-2xl border bg-white/5 px-4 py-3 text-base font-semibold text-white outline-none transition',
+            'w-full rounded-2xl border bg-white px-4 py-3 text-base font-semibold text-slate-900 outline-none transition',
             isOutOfRange
-              ? 'border-rose-500/70 ring-2 ring-rose-500/30'
-              : 'border-white/10 focus:border-brand focus:ring-2 focus:ring-brand/40',
+              ? 'border-rose-400 ring-2 ring-rose-200'
+              : 'border-slate-200 focus:border-brand focus:ring-2 focus:ring-brand/30',
           ].join(' ')}
           style={prefix ? { paddingLeft: '2.75rem' } : undefined}
         />
         {suffix ? (
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
             {suffix}
           </span>
         ) : null}
       </div>
       {rangeError ? (
-        <span className="text-xs text-rose-400">{rangeError}</span>
+        <span className="text-xs text-rose-600">{rangeError}</span>
       ) : helper ? (
-        <span className="text-xs text-slate-400">{helper}</span>
+        <span className="text-xs text-slate-500">{helper}</span>
       ) : null}
     </label>
   );
