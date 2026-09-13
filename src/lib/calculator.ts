@@ -32,21 +32,34 @@ const PERIODS_PER_YEAR: Record<ContributionFrequency, number> = {
   monthly: 12,
 };
 
+const VALID_FREQUENCIES: ContributionFrequency[] = ['weekly', 'biweekly', 'monthly'];
+
+// NaN-safe: falls back when the value isn't a finite number (corrupted share-URL,
+// tampered localStorage). Does not restrict the value's legitimate sign — use
+// safeNonNegative for fields that genuinely can't be negative.
+const safeNumber = (value: number, fallback = 0): number =>
+  Number.isFinite(value) ? value : fallback;
+const safeNonNegative = (value: number, fallback = 0): number =>
+  Math.max(0, safeNumber(value, fallback));
+
 export const calculateProjection = (input: PlanInput): ProjectionYear[] => {
-  // Guard against NaN / negative values that would silently corrupt results
+  // Guard against malformed input (e.g. a corrupted ?s= share-URL or tampered
+  // localStorage value) silently corrupting results with NaN.
   const safeInput: PlanInput = {
     ...input,
-    currentAge: Math.max(0, input.currentAge || 0),
-    retirementAge: Math.max(0, input.retirementAge || 0),
-    currentBalance: Math.max(0, input.currentBalance || 0),
-    contribution: Math.max(0, input.contribution || 0),
-    annualIncome: Math.max(0, input.annualIncome || 0),
-    annualReturn: Math.max(0, input.annualReturn || 0),
-    inflation: Math.max(0, input.inflation || 0),
-    salaryGrowth: Math.max(0, input.salaryGrowth || 0),
-    rrspCarryForward: Math.max(0, input.rrspCarryForward || 0),
-    employerMatchPercent: Math.max(0, input.employerMatchPercent || 0),
-    employerMatchCap: Math.max(0, input.employerMatchCap || 0),
+    currentAge: safeNonNegative(input.currentAge),
+    retirementAge: safeNonNegative(input.retirementAge),
+    currentBalance: safeNonNegative(input.currentBalance),
+    contribution: safeNonNegative(input.contribution),
+    annualIncome: safeNonNegative(input.annualIncome),
+    // These three can be legitimately negative (a market downturn, deflation,
+    // a pay cut) — only guard against NaN, don't clamp the sign.
+    annualReturn: safeNumber(input.annualReturn),
+    inflation: safeNumber(input.inflation),
+    salaryGrowth: safeNumber(input.salaryGrowth),
+    employerMatchPercent: safeNonNegative(input.employerMatchPercent),
+    employerMatchCap: safeNonNegative(input.employerMatchCap),
+    frequency: VALID_FREQUENCIES.includes(input.frequency) ? input.frequency : 'monthly',
   };
 
   const years = Math.max(0, safeInput.retirementAge - safeInput.currentAge);
