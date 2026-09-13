@@ -993,6 +993,18 @@ function App() {
               Includes RRSP &amp; TFSA support for Canadian accounts
             </button>
           </p>
+          <p className="mt-2">
+            Built by one engineer.{' '}
+            <a
+              href="https://buymeacoffee.com/pouriach"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-brand transition"
+            >
+              Buy me a coffee
+            </a>{' '}
+            if this was useful to you.
+          </p>
         </footer>
       </div>
     </main>
