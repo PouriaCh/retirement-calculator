@@ -974,7 +974,14 @@ function App() {
             {mode !== 'reverse' && (
               <div className="rounded-3xl border border-brand/20 bg-gradient-to-br from-white via-white to-brand/10 p-6 shadow-lg shadow-slate-200/60">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs uppercase tracking-wide text-slate-500">Your nest egg</p>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Your nest egg</p>
+                    {mode === 'customize' && (
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        Includes RRSP + TFSA, with salary growth applied
+                      </p>
+                    )}
+                  </div>
                   {mode === 'quick' && (
                     <button
                       onClick={handleCopyLink}
