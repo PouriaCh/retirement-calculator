@@ -141,6 +141,9 @@ function App() {
     return loadFromStorage(STORAGE_KEY_TFSA, defaultTfsaPlan);
   });
   const [reverseTargetIncome, setReverseTargetIncome] = useState(100000);
+  // Which mode to return to when leaving Full Control via its back button —
+  // set whenever "Adjust assumptions" is clicked from Quick Start or Set a Goal.
+  const [returnMode, setReturnMode] = useState<'quick' | 'reverse'>('quick');
   // null = no manual override, so the target tracks 70% of income automatically.
   // Once the user edits it directly, it locks to that dollar figure and stops
   // following income changes — same reasoning as Set a Goal's fixed target.
@@ -350,6 +353,45 @@ function App() {
         step={50}
         onChange={(value) => updatePlan('contribution', value)}
       />
+
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-xs uppercase tracking-wide text-slate-500 mb-3">
+          Factored into calculation
+        </p>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-600">Expected return</span>
+              <InfoTooltip label="What is expected return?">
+                The assumed annual growth rate of your investments. This is what turns your
+                contributions into a bigger nest egg over time — a higher rate means faster growth,
+                but also more risk.
+              </InfoTooltip>
+            </div>
+            <span className="font-semibold text-slate-900">{plan.annualReturn}%</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-600">Inflation</span>
+              <InfoTooltip label="What is inflation used for?">
+                Prices rise over time, so money loses buying power. This is how much we assume
+                prices rise per year — it's what converts your future balance into today's dollars,
+                shown in your results below.
+              </InfoTooltip>
+            </div>
+            <span className="font-semibold text-slate-900">{plan.inflation}%</span>
+          </div>
+        </div>
+        <button
+          onClick={() => {
+            setReturnMode('quick');
+            setMode('customize');
+          }}
+          className="mt-4 w-full text-xs font-medium text-brand hover:text-brand-dark transition"
+        >
+          Adjust assumptions →
+        </button>
+      </div>
     </div>
   );
 
@@ -447,7 +489,10 @@ function App() {
           </div>
         </div>
         <button
-          onClick={() => setMode('customize')}
+          onClick={() => {
+            setReturnMode('reverse');
+            setMode('customize');
+          }}
           className="mt-4 w-full text-xs font-medium text-brand hover:text-brand-dark transition"
         >
           Adjust assumptions →
@@ -458,12 +503,12 @@ function App() {
 
   const renderCustomize = () => (
     <div className="space-y-6">
-      {/* Back to Reverse button (if user came from Reverse) */}
+      {/* Returns to whichever mode linked here via "Adjust assumptions" */}
       <button
-        onClick={() => setMode('reverse')}
+        onClick={() => setMode(returnMode)}
         className="flex items-center gap-2 text-sm font-medium text-brand hover:text-brand-dark transition"
       >
-        ← Back to target calculation
+        {returnMode === 'quick' ? '← Back to Quick Start' : '← Back to target calculation'}
       </button>
 
       {/* Core fields */}
