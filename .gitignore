@@ -32,3 +32,7 @@ coverage/
 
 # Docker
 docker-volume/
+.vercel
+
+# Claude Code exported conversations (local-only)
+.claude/conversations/
