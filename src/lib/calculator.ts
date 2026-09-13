@@ -32,26 +32,55 @@ const PERIODS_PER_YEAR: Record<ContributionFrequency, number> = {
   monthly: 12,
 };
 
+const VALID_FREQUENCIES: ContributionFrequency[] = ['weekly', 'biweekly', 'monthly'];
+
+// NaN-safe: falls back when the value isn't a finite number (corrupted share-URL,
+// tampered localStorage). Does not restrict the value's legitimate sign — use
+// safeNonNegative for fields that genuinely can't be negative.
+const safeNumber = (value: number, fallback = 0): number =>
+  Number.isFinite(value) ? value : fallback;
+const safeNonNegative = (value: number, fallback = 0): number =>
+  Math.max(0, safeNumber(value, fallback));
+
 export const calculateProjection = (input: PlanInput): ProjectionYear[] => {
-  const years = Math.max(0, input.retirementAge - input.currentAge);
+  // Guard against malformed input (e.g. a corrupted ?s= share-URL or tampered
+  // localStorage value) silently corrupting results with NaN.
+  const safeInput: PlanInput = {
+    ...input,
+    currentAge: safeNonNegative(input.currentAge),
+    retirementAge: safeNonNegative(input.retirementAge),
+    currentBalance: safeNonNegative(input.currentBalance),
+    contribution: safeNonNegative(input.contribution),
+    annualIncome: safeNonNegative(input.annualIncome),
+    // These three can be legitimately negative (a market downturn, deflation,
+    // a pay cut) — only guard against NaN, don't clamp the sign.
+    annualReturn: safeNumber(input.annualReturn),
+    inflation: safeNumber(input.inflation),
+    salaryGrowth: safeNumber(input.salaryGrowth),
+    employerMatchPercent: safeNonNegative(input.employerMatchPercent),
+    employerMatchCap: safeNonNegative(input.employerMatchCap),
+    frequency: VALID_FREQUENCIES.includes(input.frequency) ? input.frequency : 'monthly',
+  };
+
+  const years = Math.max(0, safeInput.retirementAge - safeInput.currentAge);
   const projection: ProjectionYear[] = [];
 
-  let balance = input.currentBalance;
-  let employeeAnnual = input.contribution * PERIODS_PER_YEAR[input.frequency];
-  let currentIncome = input.annualIncome;
+  let balance = safeInput.currentBalance;
+  let employeeAnnual = safeInput.contribution * PERIODS_PER_YEAR[safeInput.frequency];
+  let currentIncome = safeInput.annualIncome;
   let totalContributions = 0;
   let totalGrowth = 0;
 
-  const annualReturnRate = input.annualReturn / 100;
-  const inflationRate = input.inflation / 100;
-  const salaryGrowthRate = input.salaryGrowth / 100;
+  const annualReturnRate = safeInput.annualReturn / 100;
+  const inflationRate = safeInput.inflation / 100;
+  const salaryGrowthRate = safeInput.salaryGrowth / 100;
   const monthlyReturn = Math.pow(1 + annualReturnRate, 1 / 12) - 1;
 
-  const matchRate = (input.employerMatchPercent ?? 0) / 100;
-  const matchCapRate = (input.employerMatchCap ?? 0) / 100;
+  const matchRate = (safeInput.employerMatchPercent ?? 0) / 100;
+  const matchCapRate = (safeInput.employerMatchCap ?? 0) / 100;
 
   for (let year = 0; year < years; year += 1) {
-    const age = input.currentAge + year;
+    const age = safeInput.currentAge + year;
 
     // Employer match: match% of employee contribution, capped at matchCap% of salary
     const uncappedMatch = employeeAnnual * matchRate;
