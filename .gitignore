@@ -36,3 +36,6 @@ docker-volume/
 
 # Claude Code exported conversations (local-only)
 .claude/conversations/
+
+# Serena MCP local tooling config (not project source)
+.serena/
