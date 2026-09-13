@@ -45,8 +45,10 @@ const defaultTfsaPlan = {
   annualReturn: 5.5,
 };
 
-const CRA_MAX_2024 = 31560;
-const TFSA_ANNUAL_LIMIT_2024 = 7000;
+// Source: CRA "MP, DB, RRSP, DPSP and TFSA limits and YMPE" page, updated 2025-12-01
+// https://www.canada.ca/en/revenue-agency/services/tax/registered-plans-administrators/pspa/mp-rrsp-dpsp-tfsa-limits-ympe.html
+const CRA_MAX_2026 = 33810;
+const TFSA_ANNUAL_LIMIT_2026 = 7000;
 
 const currency = new Intl.NumberFormat('en-CA', {
   style: 'currency',
@@ -202,6 +204,16 @@ function App() {
   const tfsaSummary = useMemo(() => summarizeProjection(tfsaProjection), [tfsaProjection]);
 
   const annualContribution = plan.contribution * PERIODS_PER_YEAR[plan.frequency];
+  // RRSP deduction room: 18% of income, capped at the CRA dollar limit, plus any
+  // carried-forward room from a prior year's Notice of Assessment. Over-contributing
+  // is penalized by CRA at 1%/month, so this is worth surfacing, not just collecting.
+  const baseDeductionRoom = Math.min(plan.annualIncome * 0.18, CRA_MAX_2026);
+  const maxDeductible = baseDeductionRoom + (plan.rrspCarryForward ?? 0);
+  const rrspOverContribution = annualContribution > maxDeductible;
+  const rrspRemainingRoom = Math.max(0, maxDeductible - annualContribution);
+  const tfsaAnnualContribution = tfsaPlan.contribution * PERIODS_PER_YEAR[tfsaPlan.frequency];
+  const tfsaOverContribution = tfsaAnnualContribution > TFSA_ANNUAL_LIMIT_2026;
+  const tfsaRemainingRoom = Math.max(0, TFSA_ANNUAL_LIMIT_2026 - tfsaAnnualContribution);
   const safeWithdrawal = summary.finalBalance * 0.04;
   const tfsaSafeWithdrawal = tfsaSummary.finalBalance * 0.04;
   // Only Full Control ever shows or collects TFSA inputs — Quick Start and
@@ -596,6 +608,25 @@ function App() {
         />
       </div>
 
+      {rrspOverContribution ? (
+        <div className="flex items-start gap-3 rounded-2xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          <div>
+            <p className="font-semibold">RRSP limit exceeded</p>
+            <p>
+              Contributing {currency.format(annualContribution)}/year is{' '}
+              {currency.format(annualContribution - maxDeductible)} over your{' '}
+              {currency.format(maxDeductible)} deduction room. CRA charges 1%/month on
+              over-contributions.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          {currency.format(rrspRemainingRoom)} of RRSP room remaining this year.
+        </div>
+      )}
+
       {/* Rates */}
       <div className="border-t border-slate-200 pt-6">
         <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Assumptions</p>
@@ -710,6 +741,24 @@ function App() {
               onChange={(value) => updateTfsaPlan('annualReturn', value)}
               tooltip="The assumed annual growth rate for your TFSA specifically — often set lower than your main account if you hold more conservative investments here."
             />
+            {tfsaOverContribution ? (
+              <div className="flex items-start gap-3 rounded-2xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+                <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold">TFSA limit exceeded</p>
+                  <p>
+                    Contributing {currency.format(tfsaAnnualContribution)}/year is{' '}
+                    {currency.format(tfsaAnnualContribution - TFSA_ANNUAL_LIMIT_2026)} over the{' '}
+                    {currency.format(TFSA_ANNUAL_LIMIT_2026)} annual limit. CRA charges 1%/month on
+                    over-contributions.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                {currency.format(tfsaRemainingRoom)} of TFSA room remaining this year.
+              </div>
+            )}
           </div>
         </>
       )}
