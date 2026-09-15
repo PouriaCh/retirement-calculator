@@ -1106,6 +1106,10 @@ function App() {
             </a>{' '}
             if this was useful to you.
           </p>
+          <p className="mt-2 text-slate-400">
+            We use privacy-friendly analytics to count visits — no cookies, and it never sees what
+            you type into the calculator.
+          </p>
         </footer>
       </div>
     </main>
