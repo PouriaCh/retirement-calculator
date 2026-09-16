@@ -365,45 +365,6 @@ function App() {
         step={50}
         onChange={(value) => updatePlan('contribution', value)}
       />
-
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <p className="text-xs uppercase tracking-wide text-slate-500 mb-3">
-          Factored into calculation
-        </p>
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="text-slate-600">Expected return</span>
-              <InfoTooltip label="What is expected return?">
-                The assumed annual growth rate of your investments. This is what turns your
-                contributions into a bigger nest egg over time — a higher rate means faster growth,
-                but also more risk.
-              </InfoTooltip>
-            </div>
-            <span className="font-semibold text-slate-900">{plan.annualReturn}%</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="text-slate-600">Inflation</span>
-              <InfoTooltip label="What is inflation used for?">
-                Prices rise over time, so money loses buying power. This is how much we assume
-                prices rise per year — it's what converts your future balance into today's dollars,
-                shown in your results below.
-              </InfoTooltip>
-            </div>
-            <span className="font-semibold text-slate-900">{plan.inflation}%</span>
-          </div>
-        </div>
-        <button
-          onClick={() => {
-            setReturnMode('quick');
-            setMode('customize');
-          }}
-          className="mt-4 w-full text-xs font-medium text-brand hover:text-brand-dark transition"
-        >
-          Adjust assumptions →
-        </button>
-      </div>
     </div>
   );
 
@@ -464,52 +425,6 @@ function App() {
         step={1000}
         onChange={(value) => updatePlan('currentBalance', value)}
       />
-
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <p className="text-xs uppercase tracking-wide text-slate-500 mb-3">
-          Factored into calculation
-        </p>
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="text-slate-600">Expected return</span>
-              <InfoTooltip label="What is expected return?">
-                The assumed annual growth rate of your investments. This is what turns your
-                contributions into a bigger nest egg over time — a higher rate means faster growth,
-                but also more risk.
-              </InfoTooltip>
-            </div>
-            <span className="font-semibold text-slate-900">{plan.annualReturn}%</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="text-slate-600">Inflation</span>
-              <InfoTooltip label="What is inflation used for?">
-                Prices rise over time, so money loses buying power. This is how much we assume
-                prices rise per year — it's what makes your ${reverseTargetIncome.toLocaleString()}{' '}
-                target mean the same thing it means today, not a smaller amount by the time you
-                retire.
-              </InfoTooltip>
-            </div>
-            <span className="font-semibold text-slate-900">{plan.inflation}%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-600">Contribution frequency</span>
-            <span className="font-semibold text-slate-900 capitalize">
-              {plan.frequency === 'biweekly' ? 'Bi-weekly' : plan.frequency}
-            </span>
-          </div>
-        </div>
-        <button
-          onClick={() => {
-            setReturnMode('reverse');
-            setMode('customize');
-          }}
-          className="mt-4 w-full text-xs font-medium text-brand hover:text-brand-dark transition"
-        >
-          Adjust assumptions →
-        </button>
-      </div>
     </div>
   );
 
@@ -970,6 +885,54 @@ function App() {
               </div>
             )}
 
+            {mode === 'reverse' && (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500 mb-3">
+                  Factored into calculation
+                </p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-600">Expected return</span>
+                      <InfoTooltip label="What is expected return?">
+                        The assumed annual growth rate of your investments. This is what turns your
+                        contributions into a bigger nest egg over time — a higher rate means faster
+                        growth, but also more risk.
+                      </InfoTooltip>
+                    </div>
+                    <span className="font-semibold text-slate-900">{plan.annualReturn}%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-600">Inflation</span>
+                      <InfoTooltip label="What is inflation used for?">
+                        Prices rise over time, so money loses buying power. This is how much we
+                        assume prices rise per year — it's what makes your $
+                        {reverseTargetIncome.toLocaleString()} target mean the same thing it means
+                        today, not a smaller amount by the time you retire.
+                      </InfoTooltip>
+                    </div>
+                    <span className="font-semibold text-slate-900">{plan.inflation}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Contribution frequency</span>
+                    <span className="font-semibold text-slate-900 capitalize">
+                      {plan.frequency === 'biweekly' ? 'Bi-weekly' : plan.frequency}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setReturnMode('reverse');
+                    setMode('customize');
+                  }}
+                  className="mt-4 w-full text-xs font-medium text-brand hover:text-brand-dark transition"
+                >
+                  Adjust assumptions →
+                </button>
+              </div>
+            )}
+
             {/* Key stats (hidden in Reverse mode) */}
             {mode !== 'reverse' && (
               <div className="rounded-3xl border border-brand/20 bg-gradient-to-br from-white via-white to-brand/10 p-6 shadow-lg shadow-slate-200/60">
@@ -1017,6 +980,47 @@ function App() {
                     accent="emerald"
                   />
                 </div>
+              </div>
+            )}
+
+            {mode === 'quick' && (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500 mb-3">
+                  Factored into calculation
+                </p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-600">Expected return</span>
+                      <InfoTooltip label="What is expected return?">
+                        The assumed annual growth rate of your investments. This is what turns your
+                        contributions into a bigger nest egg over time — a higher rate means faster
+                        growth, but also more risk.
+                      </InfoTooltip>
+                    </div>
+                    <span className="font-semibold text-slate-900">{plan.annualReturn}%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-600">Inflation</span>
+                      <InfoTooltip label="What is inflation used for?">
+                        Prices rise over time, so money loses buying power. This is how much we
+                        assume prices rise per year — it's what converts your future balance into
+                        today's dollars, shown in your results above.
+                      </InfoTooltip>
+                    </div>
+                    <span className="font-semibold text-slate-900">{plan.inflation}%</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setReturnMode('quick');
+                    setMode('customize');
+                  }}
+                  className="mt-4 w-full text-xs font-medium text-brand hover:text-brand-dark transition"
+                >
+                  Adjust assumptions →
+                </button>
               </div>
             )}
 
