@@ -214,14 +214,14 @@ function App() {
   const tfsaAnnualContribution = tfsaPlan.contribution * PERIODS_PER_YEAR[tfsaPlan.frequency];
   const tfsaOverContribution = tfsaAnnualContribution > TFSA_ANNUAL_LIMIT_2026;
   const tfsaRemainingRoom = Math.max(0, TFSA_ANNUAL_LIMIT_2026 - tfsaAnnualContribution);
-  const safeWithdrawal = summary.finalBalance * 0.04;
-  const tfsaSafeWithdrawal = tfsaSummary.finalBalance * 0.04;
   // Only Full Control ever shows or collects TFSA inputs — Quick Start and
   // Set a Goal must not silently fold in a TFSA balance/contribution the
   // user never entered or saw.
   const includeTfsa = mode === 'customize';
-  const combinedSafeWithdrawal = safeWithdrawal + (includeTfsa ? tfsaSafeWithdrawal : 0);
-  const combinedNestEgg = summary.finalBalance + (includeTfsa ? tfsaSummary.finalBalance : 0);
+  // "Total at retirement" is labeled and explained as being in today's
+  // dollars, so it must use the inflation-adjusted balance, not the nominal
+  // one — otherwise it silently disagrees with Set a Goal's "Nest egg
+  // needed", which is correctly computed from the inflation-adjusted figure.
   const combinedInflationAdjusted =
     summary.inflationAdjusted + (includeTfsa ? tfsaSummary.inflationAdjusted : 0);
 
@@ -274,7 +274,7 @@ function App() {
 
   // Animated versions of the headline numbers — gives each result a "reveal"
   // moment instead of snapping instantly when inputs change.
-  const animatedNestEgg = useCountUp(combinedNestEgg);
+  const animatedNestEgg = useCountUp(combinedInflationAdjusted);
   const animatedRetirementIncome = useCountUp(combinedInflationAdjustedWithdrawal);
   const animatedNestEggNeeded = useCountUp(reverseTargetIncome / 0.04);
   const animatedRequiredSavings = useCountUp(requiredMonthlyForTarget);
