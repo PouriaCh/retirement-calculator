@@ -12,7 +12,8 @@
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "types": ["vite/client", "node"],
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
   "include": ["src", "tests/calculator.test.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
